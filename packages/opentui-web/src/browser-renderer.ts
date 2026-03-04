@@ -2,6 +2,7 @@ import { BrowserBuffer } from "./browser-buffer"
 import { BrowserRenderContext } from "./browser-render-context"
 import { CanvasPainter } from "./canvas-painter"
 import { SelectionManager } from "./selection-manager"
+import { getLinkId } from "./core-shims/index"
 
 // We import these via the core-shims alias in the Vite build
 // but for the renderer we import directly to avoid circular deps
@@ -29,6 +30,7 @@ export class BrowserRenderer {
   private needsRender: boolean = true
   private isDragOver: boolean = false
   private cleanupListeners: (() => void)[] = []
+  private mouseDownCell: { col: number; row: number } | null = null
 
   constructor(canvas: HTMLCanvasElement, cols: number, rows: number) {
     this.canvas = canvas
@@ -121,7 +123,9 @@ export class BrowserRenderer {
     const onMouseDown = (e: MouseEvent) => {
       // Only left button
       if (e.button !== 0) return
+      this.canvas.focus()
       const { col, row } = this.pixelToCell(e.clientX, e.clientY)
+      this.mouseDownCell = { col, row }
       this.selection.startSelection(col, row)
       this.needsRender = true
     }
@@ -137,10 +141,31 @@ export class BrowserRenderer {
     window.addEventListener("mousemove", onMouseMove)
     this.cleanupListeners.push(() => window.removeEventListener("mousemove", onMouseMove))
 
-    const onMouseUp = (_e: MouseEvent) => {
-      if (!this.selection.selecting) return
-      this.selection.endSelection()
-      this.needsRender = true
+    const onMouseUp = (e: MouseEvent) => {
+      const wasSelecting = this.selection.selecting
+      if (wasSelecting) {
+        this.selection.endSelection()
+        this.needsRender = true
+      }
+
+      // Check for link click: same cell as mousedown (no drag)
+      if (e.button === 0 && this.mouseDownCell) {
+        const { col, row } = this.pixelToCell(e.clientX, e.clientY)
+        if (col === this.mouseDownCell.col && row === this.mouseDownCell.row) {
+          const idx = row * this.buffer.width + col
+          if (idx >= 0 && idx < this.buffer.attributes.length) {
+            const attr = this.buffer.attributes[idx]
+            const linkId = getLinkId(attr)
+            if (linkId > 0) {
+              const url = this.buffer.getLinkUrl(linkId)
+              if (url) {
+                window.open(url, "_blank")
+              }
+            }
+          }
+        }
+        this.mouseDownCell = null
+      }
     }
     window.addEventListener("mouseup", onMouseUp)
     this.cleanupListeners.push(() => window.removeEventListener("mouseup", onMouseUp))
@@ -168,6 +193,7 @@ export class BrowserRenderer {
 
     // --- Paste ---
     const onPaste = (e: ClipboardEvent) => {
+      if (document.activeElement !== this.canvas) return
       const text = e.clipboardData?.getData("text/plain")
       if (text) {
         e.preventDefault()
@@ -271,6 +297,11 @@ export class BrowserRenderer {
     this.needsRender = true
   }
 
+  private static PREVENT_DEFAULT_KEYS = new Set([
+    "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+    " ", "PageUp", "PageDown", "Tab", "Home", "End",
+  ])
+
   private static MODIFIER_KEYS = new Set(["Alt", "Control", "Meta", "Shift"])
 
   private static KEY_MAP: Record<string, string> = {
@@ -291,6 +322,11 @@ export class BrowserRenderer {
   }
 
   handleKeyDown(event: KeyboardEvent): void {
+    // Prevent navigation keys from scrolling the page
+    if (BrowserRenderer.PREVENT_DEFAULT_KEYS.has(event.key)) {
+      event.preventDefault()
+    }
+
     // Copy selected text to clipboard (Cmd+C, Ctrl+C, or Option+C on Mac where key is "ç")
     if (this.selection.active && (event.key === "c" || event.key === "ç") && (event.metaKey || event.ctrlKey || event.altKey)) {
       const text = this.selection.getSelectedText(this.buffer)

@@ -63,10 +63,12 @@ export function mountOpenTui(
   root.render(element)
   renderer.start()
 
+  // Always make canvas focusable via click
+  canvas.tabIndex = 0
+
   // Keyboard
   let keydownHandler: ((e: KeyboardEvent) => void) | null = null
   if (keyboard) {
-    canvas.tabIndex = 0
     keydownHandler = (e: KeyboardEvent) => renderer.handleKeyDown(e)
     canvas.addEventListener("keydown", keydownHandler)
   }

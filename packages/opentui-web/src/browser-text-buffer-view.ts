@@ -6,6 +6,7 @@ export interface VisibleLineChunk {
   fg: RGBA
   bg: RGBA
   attributes: number
+  link?: { url: string }
 }
 
 export interface VisibleLine {
@@ -182,12 +183,14 @@ export class BrowserTextBufferView {
           logicalLines.push([])
         }
         if (parts[i].length > 0) {
-          logicalLines[logicalLines.length - 1].push({
+          const vlc: VisibleLineChunk = {
             text: parts[i],
             fg: chunk.fg ?? dfg,
             bg: chunk.bg ?? dbg,
             attributes: chunk.attributes ?? 0,
-          })
+          }
+          if (chunk.link) vlc.link = chunk.link
+          logicalLines[logicalLines.length - 1].push(vlc)
         }
       }
     }
@@ -261,12 +264,14 @@ export class BrowserTextBufferView {
       const slicedText = chunk.text.slice(sliceStart, sliceEnd)
 
       if (slicedText.length > 0) {
-        result.push({
+        const sliced: VisibleLineChunk = {
           text: slicedText,
           fg: chunk.fg,
           bg: chunk.bg,
           attributes: chunk.attributes,
-        })
+        }
+        if (chunk.link) sliced.link = chunk.link
+        result.push(sliced)
       }
 
       offset = chunkEnd

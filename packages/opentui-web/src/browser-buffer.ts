@@ -1,5 +1,6 @@
 import type { RGBA } from "./core-shims/rgba"
 import type { CapturedLine, CapturedSpan } from "./core-shims/types"
+import { attributesWithLink } from "./core-shims/index"
 
 // Attribute flags matching TextAttributes from opentui core
 const CONTINUATION = 0xc0000000
@@ -44,6 +45,10 @@ export class BrowserBuffer {
 
   private scissorStack: ScissorRect[] = []
   private opacityStack: number[] = []
+
+  // Link registry for clickable links
+  public linkRegistry: Map<number, string> = new Map()
+  private nextLinkId: number = 1
 
   constructor(
     width: number,
@@ -108,6 +113,16 @@ export class BrowserBuffer {
     return this.id
   }
 
+  registerLink(url: string): number {
+    const id = this.nextLinkId++
+    this.linkRegistry.set(id, url)
+    return id
+  }
+
+  getLinkUrl(linkId: number): string | undefined {
+    return this.linkRegistry.get(linkId)
+  }
+
   private isInScissor(x: number, y: number): boolean {
     if (this.scissorStack.length === 0) return true
     const rect = this.scissorStack[this.scissorStack.length - 1]
@@ -139,6 +154,8 @@ export class BrowserBuffer {
     const size = this._width * this._height
     this.char.fill(0x20) // space
     this.attributes.fill(0)
+    this.linkRegistry.clear()
+    this.nextLinkId = 1
 
     if (bg) {
       for (let i = 0; i < size; i++) {
@@ -504,7 +521,13 @@ export class BrowserBuffer {
         const text = chunk.text
         const fgColor = chunk.fg
         const bgColor = chunk.bg
-        const attr = chunk.attributes ?? 0
+        let attr = chunk.attributes ?? 0
+
+        // Encode link ID into attributes if chunk has a link
+        if (chunk.link && chunk.link.url) {
+          const linkId = this.registerLink(chunk.link.url)
+          attr = attributesWithLink(attr, linkId)
+        }
 
         for (const ch of text) {
           if (curX >= this._width) break
@@ -521,17 +544,128 @@ export class BrowserBuffer {
     this.drawTextBufferView(textBufferView, x, y)
   }
 
-  // Stubs for methods we don't need in the PoC
   drawFrameBuffer(
-    _destX: number,
-    _destY: number,
-    _frameBuffer: BrowserBuffer,
-    _sourceX?: number,
-    _sourceY?: number,
-    _sourceWidth?: number,
-    _sourceHeight?: number,
-  ): void {}
-  drawEditorView(_editorView: any, _x: number, _y: number): void {}
+    destX: number,
+    destY: number,
+    frameBuffer: BrowserBuffer,
+    sourceX: number = 0,
+    sourceY: number = 0,
+    sourceWidth?: number,
+    sourceHeight?: number,
+  ): void {
+    const sw = sourceWidth ?? frameBuffer.width
+    const sh = sourceHeight ?? frameBuffer.height
+    const srcChar = frameBuffer.char
+    const srcFg = frameBuffer.fg
+    const srcBg = frameBuffer.bg
+    const srcAttr = frameBuffer.attributes
+    const srcCols = frameBuffer.width
+
+    for (let row = 0; row < sh; row++) {
+      const srcRow = sourceY + row
+      const dstRow = destY + row
+      if (srcRow < 0 || srcRow >= frameBuffer.height) continue
+      if (dstRow < 0 || dstRow >= this._height) continue
+
+      for (let col = 0; col < sw; col++) {
+        const srcCol = sourceX + col
+        const dstCol = destX + col
+        if (srcCol < 0 || srcCol >= frameBuffer.width) continue
+        if (dstCol < 0 || dstCol >= this._width) continue
+        if (!this.isInScissor(dstCol, dstRow)) continue
+
+        const srcIdx = srcRow * srcCols + srcCol
+        const dstIdx = dstRow * this._width + dstCol
+        const srcOffset = srcIdx * 4
+        const dstOffset = dstIdx * 4
+
+        this.char[dstIdx] = srcChar[srcIdx]
+        this.attributes[dstIdx] = srcAttr[srcIdx]
+
+        // Apply opacity to fg
+        const fgA = srcFg[srcOffset + 3]
+        const opacityMul = this.getCurrentOpacityMultiplier()
+        this.fg[dstOffset] = srcFg[srcOffset]
+        this.fg[dstOffset + 1] = srcFg[srcOffset + 1]
+        this.fg[dstOffset + 2] = srcFg[srcOffset + 2]
+        this.fg[dstOffset + 3] = fgA * opacityMul
+
+        // Apply opacity to bg
+        const bgA = srcBg[srcOffset + 3]
+        this.bg[dstOffset] = srcBg[srcOffset]
+        this.bg[dstOffset + 1] = srcBg[srcOffset + 1]
+        this.bg[dstOffset + 2] = srcBg[srcOffset + 2]
+        this.bg[dstOffset + 3] = bgA * opacityMul
+      }
+    }
+  }
+  drawEditorView(editorView: any, x: number, y: number): void {
+    if (!editorView) return
+
+    const viewport = editorView.getViewport()
+    const text = editorView.getText()
+    const lines = text.split("\n")
+
+    // Default colors
+    const dfg = editorView.editBuffer?._defaultFg ?? {
+      r: 1, g: 1, b: 1, a: 1,
+      buffer: new Float32Array([1, 1, 1, 1]),
+    } as RGBA
+    const dbg = editorView.editBuffer?._defaultBg ?? {
+      r: 0, g: 0, b: 0, a: 0,
+      buffer: new Float32Array([0, 0, 0, 0]),
+    } as RGBA
+
+    const visibleRows = viewport.height > 0 ? viewport.height : this._height - y
+
+    if (text === "" && editorView._placeholderChunks && editorView._placeholderChunks.length > 0) {
+      // Draw placeholder text
+      let curX = x
+      for (const chunk of editorView._placeholderChunks) {
+        const chunkFg = chunk.fg ?? dfg
+        const chunkBg = chunk.bg ?? dbg
+        const attr = (chunk.attributes ?? 0) | 2 // DIM attribute = 1 << 1
+        for (const ch of chunk.text) {
+          if (curX >= this._width) break
+          if (curX >= 0 && y >= 0 && y < this._height) {
+            this.setCell(curX, y, ch, chunkFg, chunkBg, attr)
+          }
+          curX++
+        }
+      }
+    } else {
+      // Draw text lines
+      for (let row = 0; row < visibleRows; row++) {
+        const lineIdx = viewport.offsetY + row
+        if (lineIdx < 0 || lineIdx >= lines.length) continue
+        const dstRow = y + row
+        if (dstRow < 0 || dstRow >= this._height) continue
+
+        const line = lines[lineIdx]
+        for (let col = 0; col < line.length; col++) {
+          const srcCol = viewport.offsetX + col
+          if (srcCol < 0 || srcCol >= line.length) continue
+          const dstCol = x + col
+          if (dstCol < 0 || dstCol >= this._width) break
+
+          this.setCell(dstCol, dstRow, line[srcCol], dfg, dbg, 0)
+        }
+      }
+    }
+
+    // Draw cursor with INVERSE attribute
+    const cursor = editorView.getVisualCursor()
+    if (cursor) {
+      const cursorX = x + cursor.visualCol
+      const cursorY = y + cursor.visualRow
+      if (cursorX >= 0 && cursorX < this._width && cursorY >= 0 && cursorY < this._height) {
+        const idx = cursorY * this._width + cursorX
+        const charCode = this.char[idx]
+        const ch = charCode === 0 || charCode === 0x20 ? " " : String.fromCodePoint(charCode)
+        this.setCell(cursorX, cursorY, ch, dfg, dbg, 32) // INVERSE = 1 << 5 = 32
+      }
+    }
+  }
   drawSuperSampleBuffer(): void {}
   drawPackedBuffer(): void {}
   drawGrayscaleBuffer(): void {}

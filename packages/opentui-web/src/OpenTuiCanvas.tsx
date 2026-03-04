@@ -88,8 +88,8 @@ export function OpenTuiCanvas({
     root.render(children)
     renderer.start()
 
+    canvas.tabIndex = 0
     if (autoFocus) {
-      canvas.tabIndex = 0
       canvas.focus()
     }
 
