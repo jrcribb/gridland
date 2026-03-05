@@ -1,13 +1,13 @@
 ---
 title: Table
-description: Tabular data rendering with configurable columns
+description: Tabular data rendering with automatic column detection
 ---
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import TableDemo from '@/components/demos/table-demo'
 
-The `Table` component from `opentui-ui` renders structured data in a table
-layout with configurable columns and alignment.
+The `Table` component from `opentui-ui` renders structured data in a bordered table
+with automatic column detection and box-drawing characters.
 
 <div className="my-8">
   <TableDemo />
@@ -46,34 +46,33 @@ import { Table } from "opentui-ui"
 
 ## Usage
 
-```tsx title="Example"
+```tsx title="Basic usage"
 <Table
-  columns={[
-    { header: "Name", key: "name", width: 20 },
-    { header: "Age", key: "age", width: 5, align: "right" },
-  ]}
   data={[
-    { name: "Alice", age: 30 },
-    { name: "Bob", age: 25 },
+    { name: "Alice", age: 30, role: "Engineer" },
+    { name: "Bob", age: 25, role: "Designer" },
   ]}
+/>
+```
+
+```tsx title="Custom columns and colors"
+<Table
+  data={[
+    { name: "Alice", age: 30, role: "Engineer" },
+    { name: "Bob", age: 25, role: "Designer" },
+  ]}
+  columns={["name", "role"]}
+  headerColor="cyan"
+  borderColor="#5e81ac"
 />
 ```
 
 ## Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `columns` | `Column[]` | Column definitions |
-| `data` | `Record[]` | Array of row data objects |
-| `borderStyle` | `string` | Border style for the table |
-| `headerColor` | `string` | Foreground color for headers |
-
-## Column Definition
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `header` | `string` | Column header text |
-| `key` | `string` | Key to read from data objects |
-| `width` | `number` | Column width in cells |
-| `align` | `"left" \| "center" \| "right"` | Text alignment (default: left) |
-| `color` | `string` | Foreground color for this column |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `data` | `T[]` | — | Array of data objects to display |
+| `columns` | `(keyof T)[]` | — | Keys to display as columns (auto-detected from data if omitted) |
+| `padding` | `number` | `1` | Cell padding in characters |
+| `headerColor` | `string` | `"blue"` | Foreground color for header text |
+| `borderColor` | `string` | — | Color for border characters |
