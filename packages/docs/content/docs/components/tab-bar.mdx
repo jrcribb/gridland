@@ -1,0 +1,61 @@
+---
+title: TabBar
+description: Horizontal single-line tab selector with label and options
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import TabBarDemo from '@/components/demos/tab-bar-demo'
+
+The `TabBar` component from `opentui-ui` renders a horizontal, single-line selector
+that displays a row of text options with one visually marked as selected.
+
+<div className="my-8">
+  <TabBarDemo />
+</div>
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+<Tab value="npm">
+```bash title="Terminal"
+npm install opentui-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash title="Terminal"
+yarn add opentui-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash title="Terminal"
+pnpm add opentui-ui
+```
+</Tab>
+<Tab value="bun">
+```bash title="Terminal"
+bun add opentui-ui
+```
+</Tab>
+</Tabs>
+
+## Import
+
+```tsx title="Import"
+import { TabBar } from "opentui-ui"
+```
+
+## Usage
+
+```tsx title="Example"
+<TabBar label="View" options={["Files", "Search", "Git"]} selectedIndex={0} />
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | `undefined` | Text label shown before the options |
+| `options` | `string[]` | -- | Array of option strings to display |
+| `selectedIndex` | `number` | -- | Zero-based index of the currently selected option |
+| `focused` | `boolean` | `true` | Whether the tab bar appears focused |
+| `activeColor` | `string` | `"cyan"` | Foreground color of the selected option when focused |

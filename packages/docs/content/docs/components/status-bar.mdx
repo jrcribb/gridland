@@ -1,0 +1,70 @@
+---
+title: StatusBar
+description: Horizontal bar displaying keybinding hints
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import StatusBarDemo from '@/components/demos/status-bar-demo'
+
+The `StatusBar` component from `opentui-ui` renders a horizontal bar that
+displays keybinding hints showing key combinations and their associated actions.
+
+<div className="my-8">
+  <StatusBarDemo />
+</div>
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+<Tab value="npm">
+```bash title="Terminal"
+npm install opentui-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash title="Terminal"
+yarn add opentui-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash title="Terminal"
+pnpm add opentui-ui
+```
+</Tab>
+<Tab value="bun">
+```bash title="Terminal"
+bun add opentui-ui
+```
+</Tab>
+</Tabs>
+
+## Import
+
+```tsx title="Import"
+import { StatusBar } from "opentui-ui"
+```
+
+## Usage
+
+```tsx title="Example"
+<StatusBar
+  items={[
+    { key: "Tab", label: "switch focus" },
+    { key: "q", label: "quit" },
+  ]}
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `items` | `StatusBarItem[]` | -- | Array of keybinding hints to display |
+| `extra` | `ReactNode` | `undefined` | Optional inline content rendered left of the hints (must be `<span>` or string) |
+
+### StatusBarItem
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | `string` | Key or key combination text |
+| `label` | `string` | Description of what the key does |

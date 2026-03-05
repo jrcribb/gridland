@@ -1,0 +1,91 @@
+---
+title: Chat
+description: Vertical chat interface with messages, tool calls, streaming, and text input
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import ChatDemo from '@/components/demos/chat-demo'
+
+The `ChatPanel` component from `opentui-ui` renders a vertical chat interface
+with message display, tool call status cards, streaming text, loading indicators, and text input.
+
+<div className="my-8">
+  <ChatDemo />
+</div>
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+<Tab value="npm">
+```bash title="Terminal"
+npm install opentui-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash title="Terminal"
+yarn add opentui-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash title="Terminal"
+pnpm add opentui-ui
+```
+</Tab>
+<Tab value="bun">
+```bash title="Terminal"
+bun add opentui-ui
+```
+</Tab>
+</Tabs>
+
+## Import
+
+```tsx title="Import"
+import { ChatPanel } from "opentui-ui"
+```
+
+## Usage
+
+```tsx title="Example"
+<ChatPanel
+  messages={[
+    { id: "1", role: "user", content: "Hello!" },
+    { id: "2", role: "assistant", content: "Hi there!" },
+  ]}
+  onSendMessage={(text) => console.log(text)}
+/>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `messages` | `ChatMessage[]` | -- | Array of messages to display |
+| `streamingText` | `string` | `""` | Partial streaming text from assistant |
+| `isLoading` | `boolean` | `false` | Whether the assistant is processing |
+| `activeToolCalls` | `ToolCallInfo[]` | `[]` | Active tool call status cards |
+| `onSendMessage` | `(text: string) => void` | -- | Callback when user submits a message |
+| `onCancel` | `() => void` | `undefined` | Callback for Escape key during loading/streaming |
+| `placeholder` | `string` | `"Type a message..."` | Input placeholder text |
+| `promptChar` | `string` | `"> "` | Prompt string before user input |
+| `promptColor` | `string` | `"green"` | Color of the prompt |
+| `userColor` | `string` | `"green"` | Color of user message prefix |
+| `assistantColor` | `string` | `"blue"` | Color of assistant message prefix |
+| `loadingText` | `string` | `"Thinking..."` | Loading indicator text |
+| `useKeyboard` | `(handler) => void` | `undefined` | Keyboard handler hook |
+
+### ChatMessage
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique identifier |
+| `role` | `"user" \| "assistant"` | Message sender role |
+| `content` | `string` | Message text content |
+
+### ToolCallInfo
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Unique identifier |
+| `title` | `string` | Display name of the tool call |
+| `status` | `"pending" \| "in_progress" \| "completed" \| "failed"` | Current status |

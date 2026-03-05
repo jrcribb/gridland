@@ -1,4 +1,5 @@
 import { Fragment } from "react"
+import { textStyle } from "../text-style"
 
 type Scalar = string | number | boolean | null | undefined
 type ScalarDict = { [key: string]: Scalar }
@@ -62,7 +63,7 @@ export function Table<T extends ScalarDict>({
     const inner = colInfo.map((c) => "\u2500".repeat(c.width)).join(mid)
     return (
       <text>
-        <span style={{ fg: borderColor, bold: true }}>
+        <span style={textStyle({ fg: borderColor, bold: true })}>
           {left}
           {inner}
           {right}
@@ -74,7 +75,7 @@ export function Table<T extends ScalarDict>({
   const contentRow = (rowData: Partial<T>, isHeader: boolean) => {
     const parts: any[] = []
     parts.push(
-      <span key="left-border" style={{ fg: borderColor, bold: true }}>
+      <span key="left-border" style={textStyle({ fg: borderColor, bold: true })}>
         {"\u2502"}
       </span>,
     )
@@ -86,7 +87,7 @@ export function Table<T extends ScalarDict>({
 
       if (isHeader) {
         parts.push(
-          <span key={`cell-${i}`} style={{ fg: headerColor, bold: true }}>
+          <span key={`cell-${i}`} style={textStyle({ fg: headerColor, bold: true })}>
             {padded}
           </span>,
         )
@@ -96,7 +97,7 @@ export function Table<T extends ScalarDict>({
 
       if (i < colInfo.length - 1) {
         parts.push(
-          <span key={`sep-${i}`} style={{ fg: borderColor, bold: true }}>
+          <span key={`sep-${i}`} style={textStyle({ fg: borderColor, bold: true })}>
             {"\u2502"}
           </span>,
         )
@@ -104,7 +105,7 @@ export function Table<T extends ScalarDict>({
     })
 
     parts.push(
-      <span key="right-border" style={{ fg: borderColor, bold: true }}>
+      <span key="right-border" style={textStyle({ fg: borderColor, bold: true })}>
         {"\u2502"}
       </span>,
     )

@@ -1,0 +1,64 @@
+---
+title: Modal
+description: Bordered overlay container with optional title and Escape key handling
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import ModalDemo from '@/components/demos/modal-demo'
+
+The `Modal` component from `opentui-ui` renders a bordered container that overlays
+content, optionally displays a title, and listens for the Escape key to trigger a close callback.
+
+<div className="my-8">
+  <ModalDemo />
+</div>
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+<Tab value="npm">
+```bash title="Terminal"
+npm install opentui-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash title="Terminal"
+yarn add opentui-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash title="Terminal"
+pnpm add opentui-ui
+```
+</Tab>
+<Tab value="bun">
+```bash title="Terminal"
+bun add opentui-ui
+```
+</Tab>
+</Tabs>
+
+## Import
+
+```tsx title="Import"
+import { Modal } from "opentui-ui"
+```
+
+## Usage
+
+```tsx title="Example"
+<Modal title="Settings" borderColor="blue" onClose={() => setOpen(false)}>
+  <text>Modal content here</text>
+</Modal>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | -- | Content rendered inside the modal |
+| `title` | `string` | `undefined` | Optional title at the top of the border |
+| `borderColor` | `string` | `"blue"` | Color of the border and title text |
+| `borderStyle` | `"single" \| "double" \| "rounded" \| "heavy"` | `"rounded"` | Border character set |
+| `onClose` | `() => void` | `undefined` | Callback invoked on Escape key press |
+| `useKeyboard` | `(handler) => void` | `undefined` | Keyboard handler hook |

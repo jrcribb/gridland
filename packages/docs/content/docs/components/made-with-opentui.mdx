@@ -1,0 +1,80 @@
+---
+title: Made with OpenTUI
+description: Branding components that link back to the OpenTUI project
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import MadeWithOpentuiDemo from '@/components/demos/made-with-opentui-demo'
+
+The `CornerRibbon`, `BadgeButton`, and `TextBadge` components from `opentui-ui` provide
+branding attribution that links back to the OpenTUI project website.
+
+<div className="my-8">
+  <MadeWithOpentuiDemo />
+</div>
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+<Tab value="npm">
+```bash title="Terminal"
+npm install opentui-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash title="Terminal"
+yarn add opentui-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash title="Terminal"
+pnpm add opentui-ui
+```
+</Tab>
+<Tab value="bun">
+```bash title="Terminal"
+bun add opentui-ui
+```
+</Tab>
+</Tabs>
+
+## Import
+
+```tsx title="Import"
+import { CornerRibbon, BadgeButton, TextBadge } from "opentui-ui"
+```
+
+## Usage
+
+```tsx title="CornerRibbon"
+<CornerRibbon position="top-right" />
+```
+
+```tsx title="BadgeButton"
+<BadgeButton variant="dark" />
+```
+
+```tsx title="TextBadge"
+<TextBadge />
+```
+
+## CornerRibbon Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `position` | `"top-right" \| "top-left" \| "bottom-right" \| "bottom-left"` | `"top-right"` | Corner position |
+| `className` | `string` | `undefined` | Additional CSS classes on the ribbon link |
+| `absolute` | `boolean` | `false` | Use absolute instead of fixed positioning |
+
+## BadgeButton Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `variant` | `"dark" \| "light" \| "outline"` | `"dark"` | Visual style variant |
+| `className` | `string` | `undefined` | Additional CSS classes |
+
+## TextBadge Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `className` | `string` | `undefined` | Additional CSS classes |

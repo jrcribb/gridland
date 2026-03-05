@@ -7,6 +7,10 @@ import { SelectInput } from "../components/select-input/select-input"
 import { MultiSelect } from "../components/multi-select/multi-select"
 import { TextInput } from "../components/text-input/text-input"
 import { Link } from "../components/link/link"
+import { TabBar } from "../components/tab-bar/tab-bar"
+import { StatusBar } from "../components/status-bar/status-bar"
+import { Modal } from "../components/modal/modal"
+import { ChatPanel } from "../components/chat/chat"
 import figlet from "figlet"
 // @ts-ignore — importable-fonts has no type declarations
 import ansiShadow from "figlet/importable-fonts/ANSI Shadow.js"
@@ -140,6 +144,72 @@ export const fixtures: DemoFixture[] = [
           <text fg="#d8dee9" dim>Styled text elements</text>
         </box>
       </box>
+    ),
+  },
+  {
+    name: "tab-bar",
+    cols: 60,
+    rows: 4,
+    jsx: () => (
+      <box padding={1} flexDirection="column" gap={1}>
+        <TabBar label="View" options={["Files", "Search", "Git"]} selectedIndex={0} activeColor="cyan" />
+        <TabBar options={["Tab1", "Tab2", "Tab3"]} selectedIndex={1} focused={false} />
+      </box>
+    ),
+  },
+  {
+    name: "status-bar",
+    cols: 70,
+    rows: 4,
+    jsx: () => (
+      <box padding={1} flexDirection="column" gap={1}>
+        <StatusBar
+          items={[
+            { key: "Tab", label: "switch focus" },
+            { key: "\u2190\u2192", label: "navigate" },
+            { key: "q", label: "quit" },
+          ]}
+        />
+        <StatusBar
+          extra="main.ts"
+          items={[
+            { key: "Ctrl+S", label: "save" },
+            { key: "Ctrl+Q", label: "quit" },
+          ]}
+        />
+      </box>
+    ),
+  },
+  {
+    name: "modal",
+    cols: 50,
+    rows: 10,
+    jsx: () => (
+      <Modal title="Settings" borderColor="blue">
+        <box paddingX={1}>
+          <text fg="#d8dee9">Modal content goes here</text>
+        </box>
+      </Modal>
+    ),
+  },
+  {
+    name: "chat",
+    cols: 60,
+    rows: 14,
+    jsx: () => (
+      <ChatPanel
+        messages={[
+          { id: "1", role: "user", content: "Hello, can you help me?" },
+          { id: "2", role: "assistant", content: "Sure! Let me look into that." },
+          { id: "3", role: "user", content: "Can you read my file?" },
+        ]}
+        activeToolCalls={[
+          { id: "t1", title: "Read file", status: "in_progress" },
+          { id: "t2", title: "Edit file", status: "completed" },
+        ]}
+        streamingText="Reading the file now"
+        onSendMessage={() => {}}
+      />
     ),
   },
 ]

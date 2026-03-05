@@ -1,0 +1,51 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Modal snapshots renders with title and children 1`] = `
+"╭──────────────────────────────────────╮
+│ My Dialog                            │
+│                                      │
+│Hello World                           │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+╰──────────────────────────────────────╯"
+`;
+
+exports[`Modal snapshots renders without title 1`] = `
+"╭──────────────────────────────────────╮
+│Content only                          │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+╰──────────────────────────────────────╯"
+`;
+
+exports[`Modal snapshots renders with double border 1`] = `
+"╔══════════════════════════════════════╗
+║ Double                               ║
+║                                      ║
+║Content                               ║
+║                                      ║
+║                                      ║
+║                                      ║
+║                                      ║
+║                                      ║
+╚══════════════════════════════════════╝"
+`;
+
+exports[`Modal snapshots renders with no children 1`] = `
+"╭──────────────────────────────────────╮
+│ Empty                                │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+│                                      │
+╰──────────────────────────────────────╯"
+`;

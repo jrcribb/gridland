@@ -9,6 +9,10 @@ import { TextInputInteractiveFixture } from "./fixtures/text-input-interactive"
 import { LinkFixture } from "./fixtures/link"
 import { BordersFixture } from "./fixtures/borders"
 import { AllComponentsFixture } from "./fixtures/all-components"
+import { TabBarFixture } from "./fixtures/tab-bar"
+import { StatusBarFixture } from "./fixtures/status-bar"
+import { ModalFixture } from "./fixtures/modal"
+import { ChatFixture } from "./fixtures/chat"
 
 const routes: Record<string, () => JSX.Element> = {
   "/table": TableFixture,
@@ -19,6 +23,10 @@ const routes: Record<string, () => JSX.Element> = {
   "/link": LinkFixture,
   "/borders": BordersFixture,
   "/all-components": AllComponentsFixture,
+  "/tab-bar": TabBarFixture,
+  "/status-bar": StatusBarFixture,
+  "/modal": ModalFixture,
+  "/chat": ChatFixture,
 }
 
 function App() {

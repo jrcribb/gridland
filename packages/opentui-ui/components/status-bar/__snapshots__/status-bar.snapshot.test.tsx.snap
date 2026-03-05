@@ -1,0 +1,7 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`StatusBar snapshots renders items without extra 1`] = `" Tab  switch focus  ←→  navigate  q  quit"`;
+
+exports[`StatusBar snapshots renders with extra content 1`] = `"ExtraContent  │   Tab  switch focus  ←→  navigate"`;
+
+exports[`StatusBar snapshots renders with empty items 1`] = `""`;

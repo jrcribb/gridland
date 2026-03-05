@@ -1,0 +1,65 @@
+---
+title: MacWindow
+description: Decorative macOS-style window chrome container
+---
+
+import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
+import MacWindowDemo from '@/components/demos/mac-window-demo'
+
+The `MacWindow` component from `opentui-ui` renders a decorative container that mimics
+a macOS application window, with traffic light buttons and an optional centered title.
+
+<div className="my-8">
+  <MacWindowDemo />
+</div>
+
+## Installation
+
+<Tabs items={['npm', 'yarn', 'pnpm', 'bun']}>
+<Tab value="npm">
+```bash title="Terminal"
+npm install opentui-ui
+```
+</Tab>
+<Tab value="yarn">
+```bash title="Terminal"
+yarn add opentui-ui
+```
+</Tab>
+<Tab value="pnpm">
+```bash title="Terminal"
+pnpm add opentui-ui
+```
+</Tab>
+<Tab value="bun">
+```bash title="Terminal"
+bun add opentui-ui
+```
+</Tab>
+</Tabs>
+
+## Import
+
+```tsx title="Import"
+import { MacWindow } from "opentui-ui"
+```
+
+## Usage
+
+```tsx title="Example"
+<MacWindow title="my-terminal">
+  <div>Window content here</div>
+</MacWindow>
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | `ReactNode` | -- | Content below the title bar |
+| `className` | `string` | `undefined` | Additional CSS classes |
+| `title` | `string` | `undefined` | Centered title bar text |
+| `minWidth` | `number \| string` | `undefined` | Minimum width of the window |
+| `onClose` | `() => void` | `undefined` | Close button callback |
+| `onMinimize` | `() => void` | `undefined` | Minimize button callback |
+| `onMaximize` | `() => void` | `undefined` | Maximize button callback |
