@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useTheme } from "../theme/index"
 
 export interface SpinnerProps {
   text?: string
@@ -8,7 +9,9 @@ export interface SpinnerProps {
 
 const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
-export function Spinner({ text = "Loading", color = "gray", interval = 100 }: SpinnerProps) {
+export function Spinner({ text = "Loading", color, interval = 100 }: SpinnerProps) {
+  const theme = useTheme()
+  const resolvedColor = color ?? theme.muted
   const [frame, setFrame] = useState(0)
 
   useEffect(() => {
@@ -19,7 +22,7 @@ export function Spinner({ text = "Loading", color = "gray", interval = 100 }: Sp
   }, [interval])
 
   return (
-    <text style={{ fg: color }}>
+    <text style={{ fg: resolvedColor }}>
       {frames[frame]} {text}
     </text>
   )

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { TUI } from "@polyterm.io/web"
 import { TerminalWindow } from "@/components/ui/mac-window"
-import { Gradient, GRADIENTS, type GradientName, StatusBar, textStyle } from "@polyterm.io/ui"
+import { Gradient, GRADIENTS, type GradientName, StatusBar, textStyle, useTheme } from "@polyterm.io/ui"
 import { useKeyboard } from "@opentui/react"
 import figlet from "figlet"
 // @ts-ignore — importable-fonts has no type declarations
@@ -16,6 +16,7 @@ const lines = art.split("\n").filter((l: string) => l.trimEnd().length > 0)
 const gradientNames = Object.keys(GRADIENTS) as GradientName[]
 
 function GradientApp() {
+  const theme = useTheme()
   const [index, setIndex] = useState(0)
   const name = gradientNames[index]
 
@@ -35,7 +36,7 @@ function GradientApp() {
       </box>
       <StatusBar
         items={[{ key: "←→", label: "gradient" }]}
-        extra={<span style={textStyle({ fg: "cyan", bold: true })}>{name.padEnd(11)}</span>}
+        extra={<span style={textStyle({ fg: theme.accent, bold: true })}>{name.padEnd(11)}</span>}
       />
     </box>
   )

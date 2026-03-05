@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { textStyle } from "../text-style"
+import { useTheme } from "../theme/index"
 
 export interface ModalProps {
   /** The content rendered inside the modal border. */
@@ -22,11 +23,14 @@ export interface ModalProps {
 export function Modal({
   children,
   title,
-  borderColor = "blue",
+  borderColor,
   borderStyle = "rounded",
   onClose,
   useKeyboard,
 }: ModalProps) {
+  const theme = useTheme()
+  const resolvedBorderColor = borderColor ?? theme.border
+
   // Handle Escape key
   useKeyboard?.((event: any) => {
     if (event.name === "escape" && onClose) {
@@ -41,12 +45,12 @@ export function Modal({
         flexGrow={1}
         border
         borderStyle={borderStyle}
-        borderColor={borderColor}
+        borderColor={resolvedBorderColor}
       >
         {title ? (
           <>
             <box paddingX={1} marginBottom={1}>
-              <text style={textStyle({ bold: true, fg: borderColor })}>{title}</text>
+              <text style={textStyle({ bold: true, fg: resolvedBorderColor })}>{title}</text>
             </box>
             {children}
           </>

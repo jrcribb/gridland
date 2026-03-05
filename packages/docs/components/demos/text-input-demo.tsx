@@ -2,16 +2,23 @@
 "use client"
 import { TUI } from "@polyterm.io/web"
 import { TerminalWindow } from "@/components/ui/mac-window"
-import { TextInput } from "@polyterm.io/ui"
+import { TextInput, useTheme } from "@polyterm.io/ui"
+
+function TextInputApp() {
+  const theme = useTheme()
+  return (
+    <box padding={1} flexDirection="column" gap={1}>
+      <text style={{ fg: theme.text }} bold>Enter your name:</text>
+      <TextInput placeholder="Type something..." prompt="> " />
+    </box>
+  )
+}
 
 export default function TextInputDemo() {
   return (
     <TerminalWindow title="TextInput">
       <TUI style={{ width: "100%", height: 80 }}>
-        <box padding={1} flexDirection="column" gap={1}>
-          <text fg="#d8dee9" bold>Enter your name:</text>
-          <TextInput placeholder="Type something..." prompt="> " />
-        </box>
+        <TextInputApp />
       </TUI>
     </TerminalWindow>
   )

@@ -1,4 +1,5 @@
 import { useCallback } from "react"
+import { useTheme } from "../theme/index"
 
 export type SelectInputItem<V> = {
   key?: string
@@ -35,6 +36,11 @@ export function SelectInput<V>({
   selectedBackgroundColor,
   focusedBackgroundColor,
 }: SelectInputProps<V>) {
+  const theme = useTheme()
+  const resolvedTextColor = textColor ?? theme.text
+  const resolvedSelectedTextColor = selectedTextColor ?? theme.primary
+  const resolvedFocusedTextColor = focusedTextColor ?? theme.primary
+
   const options = items.map((item) => ({
     name: item.label,
     value: item.value,
@@ -66,9 +72,9 @@ export function SelectInput<V>({
       onSelect={handleSelect}
       height={limit ?? items.length}
       showDescription={false}
-      textColor={textColor}
-      selectedTextColor={selectedTextColor}
-      focusedTextColor={focusedTextColor}
+      textColor={resolvedTextColor}
+      selectedTextColor={resolvedSelectedTextColor}
+      focusedTextColor={resolvedFocusedTextColor}
       backgroundColor={backgroundColor ?? "transparent"}
       selectedBackgroundColor={selectedBackgroundColor ?? "transparent"}
       focusedBackgroundColor={focusedBackgroundColor ?? "transparent"}

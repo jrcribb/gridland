@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react"
+import { useTheme } from "../theme/index"
 
 export interface TextInputProps {
   value?: string
@@ -17,10 +18,12 @@ export function TextInput({
   onSubmit,
   placeholder = "",
   prompt = "> ",
-  promptColor = "cyan",
+  promptColor,
   focus = true,
   maxLength,
 }: TextInputProps) {
+  const theme = useTheme()
+  const resolvedPromptColor = promptColor ?? theme.accent
   const [internalValue, setInternalValue] = useState("")
   const isControlled = controlledValue !== undefined
   const displayValue = isControlled ? controlledValue : internalValue
@@ -43,7 +46,7 @@ export function TextInput({
 
   return (
     <box>
-      {prompt && <text style={{ fg: promptColor }}>{prompt}</text>}
+      {prompt && <text style={{ fg: resolvedPromptColor }}>{prompt}</text>}
       <input
         value={displayValue}
         placeholder={placeholder}

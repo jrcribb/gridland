@@ -14,7 +14,7 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup",
-    "demo": "bun run --preload ../polyterm-web/test/preload.ts scripts/demo.tsx",
+    "demo": "bun run --preload ./scripts/preload.ts scripts/demo.tsx",
     "test": "bun test --preload ../polyterm-web/test/preload.ts",
     "test:ci": "bun test --preload ../polyterm-web/test/preload.ts --randomize --rerun-each 3"
   },

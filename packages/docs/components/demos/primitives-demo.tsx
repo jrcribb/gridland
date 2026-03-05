@@ -11,7 +11,7 @@ export default function PrimitivesDemo() {
           <box
             border
             borderStyle="rounded"
-            borderColor="#5e81ac"
+            borderColor="#75715e"
             title="Layout"
             titleAlignment="center"
             padding={1}
@@ -20,39 +20,39 @@ export default function PrimitivesDemo() {
               <box
                 border
                 borderStyle="single"
-                borderColor="#a3be8c"
+                borderColor="#a6e22e"
                 padding={1}
                 flexGrow={1}
               >
-                <text fg="#a3be8c" bold>
+                <text fg="#a6e22e" bold>
                   Box 1
                 </text>
               </box>
               <box
                 border
                 borderStyle="single"
-                borderColor="#ebcb8b"
+                borderColor="#f92672"
                 padding={1}
                 flexGrow={1}
               >
-                <text fg="#ebcb8b" bold>
+                <text fg="#f92672" bold>
                   Box 2
                 </text>
               </box>
               <box
                 border
                 borderStyle="single"
-                borderColor="#b48ead"
+                borderColor="#66d9ef"
                 padding={1}
                 flexGrow={1}
               >
-                <text fg="#b48ead" bold>
+                <text fg="#66d9ef" bold>
                   Box 3
                 </text>
               </box>
             </box>
           </box>
-          <text fg="#d8dee9" dim>
+          <text dim fg="#75715e">
             {"  Nested boxes with borders, colors & flexbox layout"}
           </text>
         </box>

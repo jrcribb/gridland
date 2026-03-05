@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react"
+import { useTheme } from "../theme/index"
 
 export type MultiSelectItem<V> = {
   key?: string
@@ -13,6 +14,8 @@ export interface MultiSelectProps<V> {
   focus?: boolean
   initialIndex?: number
   limit?: number
+  highlightColor?: string
+  checkboxColor?: string
   onSelect?: (item: MultiSelectItem<V>) => void
   onUnselect?: (item: MultiSelectItem<V>) => void
   onSubmit?: (items: MultiSelectItem<V>[]) => void
@@ -28,12 +31,17 @@ export function MultiSelect<V>({
   focus = true,
   initialIndex = 0,
   limit,
+  highlightColor,
+  checkboxColor,
   onSelect,
   onUnselect,
   onSubmit,
   onHighlight,
   useKeyboard,
 }: MultiSelectProps<V>) {
+  const theme = useTheme()
+  const resolvedHighlightColor = highlightColor ?? theme.primary
+  const resolvedCheckboxColor = checkboxColor ?? theme.secondary
   const visibleCount = limit && limit < items.length ? limit : items.length
   const clampedInitial = Math.min(Math.max(0, initialIndex), Math.max(0, items.length - 1))
 
@@ -113,13 +121,13 @@ export function MultiSelect<V>({
 
         return (
           <text key={item.key ?? String(item.value)}>
-            <span style={{ fg: isHighlighted ? "blue" : undefined }}>
+            <span style={{ fg: isHighlighted ? resolvedHighlightColor : undefined }}>
               {isHighlighted ? "\u25b6" : " "}{" "}
             </span>
-            <span style={{ fg: "green" }}>
+            <span style={{ fg: resolvedCheckboxColor }}>
               {itemIsSelected ? "\u25c9" : "\u25cb"}{" "}
             </span>
-            <span style={{ fg: isHighlighted ? "blue" : undefined }}>
+            <span style={{ fg: isHighlighted ? resolvedHighlightColor : undefined }}>
               {item.label}
             </span>
           </text>

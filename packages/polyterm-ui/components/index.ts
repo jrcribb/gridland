@@ -47,3 +47,6 @@ export { PolytermCornerRibbon, PolytermBadgeButton, PolytermTextBadge } from "./
 export type { PolytermCornerRibbonProps, PolytermBadgeButtonProps, PolytermTextBadgeProps } from "./made-with-polyterm/made-with-polyterm"
 
 export { textStyle } from "./text-style"
+
+export { ThemeProvider, useTheme, darkTheme, lightTheme } from "./theme/index"
+export type { Theme, ThemeProviderProps } from "./theme/index"

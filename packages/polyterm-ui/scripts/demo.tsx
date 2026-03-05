@@ -1,47 +1,42 @@
 // @ts-nocheck — OpenTUI intrinsic elements conflict with React's HTML/SVG types
-import { renderTui, cleanup } from "../../polyterm-testing/src/index"
-import { fixtures } from "./demo-fixtures"
+import { createElement, type ReactNode } from "react"
+import { createCliRenderer, type CliRenderer } from "../../../../opentui/packages/core/src/index"
+import { createRoot, useKeyboard } from "../../../../opentui/packages/react/src/index"
+import { demos } from "./demo-apps"
 
-const filter = process.argv[2]
+let _renderer: CliRenderer
 
-const selected = filter
-  ? fixtures.filter((f) => f.name === filter)
-  : fixtures
+function DemoShell({ children }: { children: ReactNode }) {
+  useKeyboard((event) => {
+    if (event.name === "q" || event.name === "escape") {
+      _renderer.destroy()
+    }
+  })
 
-if (filter && selected.length === 0) {
-  console.error(`Unknown component: "${filter}"`)
-  console.error(`Available: ${fixtures.map((f) => f.name).join(", ")}`)
+  return (
+    <box flexDirection="column" flexGrow={1}>
+      {children}
+    </box>
+  )
+}
+
+const name = process.argv[2]
+
+if (!name) {
+  console.log("Available demos:")
+  for (const d of demos) {
+    console.log(`  ${d.name}`)
+  }
+  console.log(`\nUsage: bun run demo <name>`)
+  process.exit(0)
+}
+
+const demo = demos.find((d) => d.name === name)
+if (!demo) {
+  console.error(`Unknown demo: "${name}"`)
+  console.error(`Available: ${demos.map((d) => d.name).join(", ")}`)
   process.exit(1)
 }
 
-// Suppress known noise from the test environment:
-// - React ErrorBoundary dumps for Zig-dependent components (TextInput)
-// - "Invalid borderStyle" warnings from primitives demo
-const origError = console.error
-console.error = (...args: any[]) => {
-  const msg = String(args[0])
-  if (msg.includes("Zig render library") || msg.includes("react-stack-top-frame")) return
-  origError(...args)
-}
-const origWarn = console.warn
-console.warn = (...args: any[]) => {
-  const msg = String(args[0])
-  if (msg.includes("Invalid borderStyle")) return
-  origWarn(...args)
-}
-
-for (const fixture of selected) {
-  const { screen } = renderTui(fixture.jsx(), {
-    cols: fixture.cols,
-    rows: fixture.rows,
-  })
-
-  console.log(`\n${"=".repeat(fixture.cols)}`)
-  console.log(`  ${fixture.name}`)
-  console.log(`${"=".repeat(fixture.cols)}`)
-  console.log(screen.text())
-
-  cleanup()
-}
-
-process.exit(0)
+_renderer = await createCliRenderer({ exitOnCtrlC: true })
+createRoot(_renderer).render(<DemoShell>{demo.app()}</DemoShell>)

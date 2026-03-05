@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { TUI } from "@polyterm.io/web"
 import { TerminalWindow } from "@/components/ui/mac-window"
-import { StatusBar, textStyle } from "@polyterm.io/ui"
+import { StatusBar, textStyle, useTheme } from "@polyterm.io/ui"
 import { useKeyboard } from "@opentui/react"
 import figlet from "figlet"
 // @ts-ignore — importable-fonts has no type declarations
@@ -44,6 +44,7 @@ function getLines(fontName: string) {
 }
 
 function AsciiApp() {
+  const theme = useTheme()
   const [fontIndex, setFontIndex] = useState(0)
   const font = fonts[fontIndex]
   const lines = getLines(font.name)
@@ -61,14 +62,14 @@ function AsciiApp() {
     <box flexDirection="column" flexGrow={1}>
       <box padding={1} flexDirection="column" alignItems="center" justifyContent="center" flexGrow={1}>
         {lines.map((line, i) => (
-          <text key={i} fg="#88c0d0" bold>
+          <text key={i} fg={theme.accent} bold>
             {line}
           </text>
         ))}
       </box>
       <StatusBar
         items={[{ key: "←→", label: "change font" }]}
-        extra={<span style={textStyle({ fg: "cyan", bold: true })}>{font.name.padEnd(11)}</span>}
+        extra={<span style={textStyle({ fg: theme.accent, bold: true })}>{font.name.padEnd(11)}</span>}
       />
     </box>
   )

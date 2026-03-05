@@ -9,8 +9,8 @@ export default function SpinnerDemo() {
     <TerminalWindow title="Spinner">
       <TUI style={{ width: "100%", height: 80 }}>
         <box padding={1} flexDirection="column" gap={1}>
-          <Spinner text="Loading..." color="cyan" />
-          <Spinner text="Processing" color="#a3be8c" />
+          <Spinner text="Loading..." />
+          <Spinner text="Processing" color="green" />
         </box>
       </TUI>
     </TerminalWindow>

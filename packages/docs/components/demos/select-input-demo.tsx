@@ -2,7 +2,7 @@
 "use client"
 import { TUI } from "@polyterm.io/web"
 import { TerminalWindow } from "@/components/ui/mac-window"
-import { SelectInput } from "@polyterm.io/ui"
+import { SelectInput, useTheme, ThemeProvider, darkTheme } from "@polyterm.io/ui"
 
 const items = [
   { label: "TypeScript", value: "ts" },
@@ -11,14 +11,22 @@ const items = [
   { label: "Rust", value: "rs" },
 ]
 
+function SelectInputApp() {
+  const theme = useTheme()
+  return (
+    <box padding={1} flexDirection="column" gap={1}>
+      <text style={{ fg: theme.text }} bold>Choose a language:</text>
+      <text> </text>
+      <SelectInput items={items} />
+    </box>
+  )
+}
+
 export default function SelectInputDemo() {
   return (
     <TerminalWindow title="SelectInput">
-      <TUI style={{ width: "100%", height: 140 }}>
-        <box padding={1} flexDirection="column" gap={1}>
-          <text fg="#d8dee9" bold>Choose a language:</text>
-          <SelectInput items={items} textColor="#d8dee9" selectedTextColor="#88c0d0" />
-        </box>
+      <TUI style={{ width: "100%", height: 160 }}>
+        <SelectInputApp />
       </TUI>
     </TerminalWindow>
   )

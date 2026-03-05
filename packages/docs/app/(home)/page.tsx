@@ -65,7 +65,7 @@ export default function HomePage() {
           Vite and Next.js are supported with first-party plugins. Any React
           framework can work with appropriate module resolution configuration.
         </Accordion>
-        <Accordion title="Is it SSR-safe?">
+        <Accordion title="Does it work with static site rendering (SSR)?">
           Yes. <code>TUI</code> renders an empty div on the server and
           hydrates the canvas on the client. No{" "}
           <code>dynamic(() =&gt; import(...), {"{"} ssr: false {"}"})</code>{" "}

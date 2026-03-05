@@ -1,4 +1,5 @@
 import { textStyle } from "../text-style"
+import { useTheme } from "../theme/index"
 
 export interface TabBarProps {
   /** Text label shown before the options. When omitted, no label is rendered but the leading space is still present. */
@@ -18,8 +19,10 @@ export function TabBar({
   options,
   selectedIndex,
   focused = true,
-  activeColor = "cyan",
+  activeColor,
 }: TabBarProps) {
+  const theme = useTheme()
+  const resolvedActiveColor = activeColor ?? theme.accent
   const parts: any[] = []
 
   // Label
@@ -46,7 +49,7 @@ export function TabBar({
       parts.push(
         <span
           key={`opt-${i}`}
-          style={textStyle({ inverse: true, bold: true, fg: activeColor })}
+          style={textStyle({ inverse: true, bold: true, fg: resolvedActiveColor })}
         >
           {padded}
         </span>,

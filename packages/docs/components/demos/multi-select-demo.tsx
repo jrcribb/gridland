@@ -2,7 +2,7 @@
 "use client"
 import { TUI } from "@polyterm.io/web"
 import { TerminalWindow } from "@/components/ui/mac-window"
-import { MultiSelect } from "@polyterm.io/ui"
+import { MultiSelect, useTheme } from "@polyterm.io/ui"
 import { useKeyboard } from "@opentui/react"
 
 const items = [
@@ -12,14 +12,21 @@ const items = [
   { label: "Rust", value: "rs" },
 ]
 
+function MultiSelectApp() {
+  const theme = useTheme()
+  return (
+    <box padding={1} flexDirection="column" gap={1}>
+      <text style={{ fg: theme.text }} bold>Select languages:</text>
+      <MultiSelect items={items} useKeyboard={useKeyboard} />
+    </box>
+  )
+}
+
 export default function MultiSelectDemo() {
   return (
     <TerminalWindow title="MultiSelect">
       <TUI style={{ width: "100%", height: 160 }}>
-        <box padding={1} flexDirection="column" gap={1}>
-          <text fg="#d8dee9" bold>Select languages:</text>
-          <MultiSelect items={items} useKeyboard={useKeyboard} />
-        </box>
+        <MultiSelectApp />
       </TUI>
     </TerminalWindow>
   )

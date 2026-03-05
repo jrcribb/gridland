@@ -1,5 +1,7 @@
 import { useState, useRef } from "react"
 import { textStyle } from "../text-style"
+import { useTheme } from "../theme/index"
+import type { Theme } from "../theme/index"
 
 export interface ChatMessage {
   /** Unique identifier for the message. Used as a list key. */
@@ -59,21 +61,23 @@ const STATUS_ICONS: Record<string, string> = {
   failed: "\u2717",
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: "gray",
-  in_progress: "yellow",
-  completed: "green",
-  failed: "red",
+function getStatusColors(theme: Theme): Record<string, string> {
+  return {
+    pending: theme.muted,
+    in_progress: theme.warning,
+    completed: theme.success,
+    failed: theme.error,
+  }
 }
 
 function MessageBubble({
   message,
-  userColor = "green",
-  assistantColor = "blue",
+  userColor,
+  assistantColor,
 }: {
   message: ChatMessage
-  userColor?: string
-  assistantColor?: string
+  userColor: string
+  assistantColor: string
 }) {
   const isUser = message.role === "user"
   const prefix = isUser ? "> " : "< "
@@ -89,11 +93,11 @@ function MessageBubble({
 
 function StreamingTextDisplay({
   text,
-  assistantColor = "blue",
+  assistantColor,
   cursorChar = "_",
 }: {
   text: string
-  assistantColor?: string
+  assistantColor: string
   cursorChar?: string
 }) {
   if (!text) return null
@@ -107,9 +111,9 @@ function StreamingTextDisplay({
   )
 }
 
-function ToolCallCard({ toolCall }: { toolCall: ToolCallInfo }) {
+function ToolCallCard({ toolCall, statusColors }: { toolCall: ToolCallInfo; statusColors: Record<string, string> }) {
   const icon = STATUS_ICONS[toolCall.status] || "\u2022"
-  const color = STATUS_COLORS[toolCall.status] || "gray"
+  const color = statusColors[toolCall.status] || "gray"
   const showEllipsis = toolCall.status === "pending" || toolCall.status === "in_progress"
 
   return (
@@ -127,14 +131,14 @@ function ChatInput({
   onSubmit,
   placeholder = "Type a message...",
   prompt = "> ",
-  promptColor = "green",
+  promptColor,
   disabled = false,
   useKeyboard,
 }: {
   onSubmit: (text: string) => void
   placeholder?: string
   prompt?: string
-  promptColor?: string
+  promptColor: string
   disabled?: boolean
   useKeyboard?: (handler: (event: any) => void) => void
 }) {
@@ -208,12 +212,17 @@ export function ChatPanel({
   onCancel,
   placeholder = "Type a message...",
   promptChar = "> ",
-  promptColor = "green",
-  userColor = "green",
-  assistantColor = "blue",
+  promptColor,
+  userColor,
+  assistantColor,
   loadingText = "Thinking...",
   useKeyboard,
 }: ChatPanelProps) {
+  const theme = useTheme()
+  const resolvedUserColor = userColor ?? theme.secondary
+  const resolvedAssistantColor = assistantColor ?? theme.primary
+  const resolvedPromptColor = promptColor ?? theme.secondary
+  const statusColors = getStatusColors(theme)
   const inputDisabled = isLoading || !!streamingText
 
   // We need to split keyboard handling: escape goes to cancel, rest to ChatInput
@@ -238,21 +247,21 @@ export function ChatPanel({
         <MessageBubble
           key={msg.id}
           message={msg}
-          userColor={userColor}
-          assistantColor={assistantColor}
+          userColor={resolvedUserColor}
+          assistantColor={resolvedAssistantColor}
         />
       ))}
 
       {/* Tool call cards */}
       {activeToolCalls.map((tc) => (
-        <ToolCallCard key={tc.id} toolCall={tc} />
+        <ToolCallCard key={tc.id} toolCall={tc} statusColors={statusColors} />
       ))}
 
       {/* Streaming text OR loading indicator */}
       {streamingText ? (
         <StreamingTextDisplay
           text={streamingText}
-          assistantColor={assistantColor}
+          assistantColor={resolvedAssistantColor}
         />
       ) : isLoading ? (
         <text style={textStyle({ dim: true })}>{"  "}{loadingText}</text>
@@ -264,7 +273,7 @@ export function ChatPanel({
           onSubmit={onSendMessage}
           placeholder={placeholder}
           prompt={promptChar}
-          promptColor={promptColor}
+          promptColor={resolvedPromptColor}
           disabled={inputDisabled}
           useKeyboard={wrappedUseKeyboard}
         />

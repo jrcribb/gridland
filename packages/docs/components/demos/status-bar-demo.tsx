@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { TUI } from "@polyterm.io/web"
 import { TerminalWindow } from "@/components/ui/mac-window"
-import { StatusBar, textStyle } from "@polyterm.io/ui"
+import { StatusBar, textStyle, useTheme } from "@polyterm.io/ui"
 import { useKeyboard } from "@opentui/react"
 
 const shortcuts = [
@@ -14,6 +14,7 @@ const shortcuts = [
 ]
 
 function StatusBarApp() {
+  const theme = useTheme()
   const [lastKey, setLastKey] = useState<string | null>(null)
 
   useKeyboard((event) => {
@@ -35,14 +36,14 @@ function StatusBarApp() {
       {lastKey ? (
         <text>
           <span>Pressed: </span>
-          <span style={textStyle({ bold: true, fg: "cyan" })}>{lastKey}</span>
+          <span style={textStyle({ bold: true, fg: theme.accent })}>{lastKey}</span>
         </text>
       ) : (
         <text style={textStyle({ dim: true })}>Press a key to trigger an action</text>
       )}
       <StatusBar
         items={shortcuts}
-        extra={<span style={textStyle({ fg: "green" })}>● Ready</span>}
+        extra={<span style={textStyle({ fg: theme.success })}>● Ready</span>}
       />
     </box>
   )

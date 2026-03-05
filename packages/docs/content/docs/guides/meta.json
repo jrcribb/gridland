@@ -1,4 +1,4 @@
 {
   "title": "Guides",
-  "pages": ["vite", "nextjs", "testing"]
+  "pages": ["vite", "nextjs", "testing", "theming"]
 }

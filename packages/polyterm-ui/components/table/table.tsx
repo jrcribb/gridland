@@ -1,5 +1,6 @@
 import { Fragment } from "react"
 import { textStyle } from "../text-style"
+import { useTheme } from "../theme/index"
 
 type Scalar = string | number | boolean | null | undefined
 type ScalarDict = { [key: string]: Scalar }
@@ -53,9 +54,12 @@ export function Table<T extends ScalarDict>({
   data,
   columns: columnsProp,
   padding = 1,
-  headerColor = "blue",
+  headerColor,
   borderColor,
 }: TableProps<T>) {
+  const theme = useTheme()
+  const resolvedHeaderColor = headerColor ?? theme.primary
+  const resolvedBorderColor = borderColor ?? theme.border
   const columns = getColumns(data, columnsProp)
   const colInfo = calculateColumnWidths(columns, data, padding)
 
@@ -63,7 +67,7 @@ export function Table<T extends ScalarDict>({
     const inner = colInfo.map((c) => "\u2500".repeat(c.width)).join(mid)
     return (
       <text>
-        <span style={textStyle({ fg: borderColor, bold: true })}>
+        <span style={textStyle({ fg: resolvedBorderColor, bold: true })}>
           {left}
           {inner}
           {right}
@@ -75,7 +79,7 @@ export function Table<T extends ScalarDict>({
   const contentRow = (rowData: Partial<T>, isHeader: boolean) => {
     const parts: any[] = []
     parts.push(
-      <span key="left-border" style={textStyle({ fg: borderColor, bold: true })}>
+      <span key="left-border" style={textStyle({ fg: resolvedBorderColor, bold: true })}>
         {"\u2502"}
       </span>,
     )
@@ -87,7 +91,7 @@ export function Table<T extends ScalarDict>({
 
       if (isHeader) {
         parts.push(
-          <span key={`cell-${i}`} style={textStyle({ fg: headerColor, bold: true })}>
+          <span key={`cell-${i}`} style={textStyle({ fg: resolvedHeaderColor, bold: true })}>
             {padded}
           </span>,
         )
@@ -97,7 +101,7 @@ export function Table<T extends ScalarDict>({
 
       if (i < colInfo.length - 1) {
         parts.push(
-          <span key={`sep-${i}`} style={textStyle({ fg: borderColor, bold: true })}>
+          <span key={`sep-${i}`} style={textStyle({ fg: resolvedBorderColor, bold: true })}>
             {"\u2502"}
           </span>,
         )
@@ -105,7 +109,7 @@ export function Table<T extends ScalarDict>({
     })
 
     parts.push(
-      <span key="right-border" style={textStyle({ fg: borderColor, bold: true })}>
+      <span key="right-border" style={textStyle({ fg: resolvedBorderColor, bold: true })}>
         {"\u2502"}
       </span>,
     )
