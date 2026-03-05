@@ -6,6 +6,7 @@ const TextAttributes = {
   DIM: 1 << 1,
   ITALIC: 1 << 2,
   UNDERLINE: 1 << 3,
+  UNDERLINE_DOTTED: 1 << 4, // repurposed BLINK bit for dotted underline in browser
   INVERSE: 1 << 5,
 }
 
@@ -392,13 +393,20 @@ export class CanvasPainter {
 
         // Draw underline
         if (isUnderline) {
+          const isDotted = !!(attr & TextAttributes.UNDERLINE_DOTTED)
           ctx.strokeStyle = ctx.fillStyle
           ctx.lineWidth = 1
           const underlineY = row * this.cellHeight + this.baselineOffset + 2
+          if (isDotted) {
+            ctx.setLineDash([2, 2])
+          }
           ctx.beginPath()
           ctx.moveTo(x, underlineY)
           ctx.lineTo(x + cw, underlineY)
           ctx.stroke()
+          if (isDotted) {
+            ctx.setLineDash([])
+          }
         }
       }
     }

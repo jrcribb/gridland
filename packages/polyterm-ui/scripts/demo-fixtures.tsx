@@ -6,7 +6,7 @@ import { Spinner } from "../components/spinner/spinner"
 import { SelectInput } from "../components/select-input/select-input"
 import { MultiSelect } from "../components/multi-select/multi-select"
 import { TextInput } from "../components/text-input/text-input"
-import { Link } from "../components/link/link"
+import { Link, type UnderlineStyle } from "../components/link/link"
 import { TabBar } from "../components/tab-bar/tab-bar"
 import { StatusBar } from "../components/status-bar/status-bar"
 import { Modal } from "../components/modal/modal"
@@ -109,14 +109,26 @@ export const fixtures: DemoFixture[] = [
   },
   {
     name: "link",
-    cols: 50,
-    rows: 6,
-    jsx: () => (
-      <box padding={1} flexDirection="column" gap={1}>
-        <text fg="#d8dee9">Click the link below:</text>
-        <Link url="https://opentui.com">Visit opentui.com</Link>
-      </box>
-    ),
+    cols: 55,
+    rows: 10,
+    jsx: () => {
+      const modes: UnderlineStyle[] = ["solid", "dotted", "none"]
+      return (
+        <box padding={1} flexDirection="column" gap={1}>
+          {modes.map((mode) => (
+            <box key={mode} flexDirection="row" gap={1}>
+              <text fg="#d8dee9" dim>{`${mode.padEnd(6)} `}</text>
+              <Link url="https://opentui.com" underline={mode}>Visit opentui.com</Link>
+            </box>
+          ))}
+          <StatusBar
+            items={[
+              { key: "\u2190\u2192", label: "underline style" },
+            ]}
+          />
+        </box>
+      )
+    },
   },
   {
     name: "ascii",

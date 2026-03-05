@@ -133,13 +133,20 @@ export class BrowserRenderer {
     this.cleanupListeners.push(() => this.canvas.removeEventListener("mousedown", onMouseDown))
 
     const onMouseMove = (e: MouseEvent) => {
-      if (!this.selection.selecting) return
+      // Update cursor style based on whether we're hovering a link
       const { col, row } = this.pixelToCell(e.clientX, e.clientY)
+      const idx = row * this.buffer.width + col
+      if (idx >= 0 && idx < this.buffer.attributes.length) {
+        const linkId = getLinkId(this.buffer.attributes[idx])
+        this.canvas.style.cursor = linkId > 0 ? "pointer" : "text"
+      }
+
+      if (!this.selection.selecting) return
       this.selection.updateSelection(col, row)
       this.needsRender = true
     }
-    window.addEventListener("mousemove", onMouseMove)
-    this.cleanupListeners.push(() => window.removeEventListener("mousemove", onMouseMove))
+    this.canvas.addEventListener("mousemove", onMouseMove)
+    this.cleanupListeners.push(() => this.canvas.removeEventListener("mousemove", onMouseMove))
 
     const onMouseUp = (e: MouseEvent) => {
       const wasSelecting = this.selection.selecting
