@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">Polyterm</h1>
+        <h1 className="text-4xl font-bold mb-4">polyterm</h1>
         <p className="text-lg text-fd-muted-foreground mb-8 max-w-lg mx-auto">
           Render terminal UIs to HTML5 Canvas with React. Built on the opentui
           engine. No xterm.js. No terminal emulator. Just pixels.

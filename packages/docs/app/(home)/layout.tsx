@@ -4,7 +4,7 @@ import type { ReactNode } from "react"
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <HomeLayout
-      nav={{ title: "Polyterm" }}
+      nav={{ title: "polyterm" }}
       links={[
         { text: "Docs", url: "/docs" },
         {

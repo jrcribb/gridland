@@ -7,18 +7,18 @@ test.describe("Link Interaction", () => {
     await waitForReady(page)
 
     const text = await getBufferText(page)
-    expect(text).toContain("Visit opentui.dev")
+    expect(text).toContain("Visit opentui.com")
   })
 
   test("link text has correct content at expected position", async ({ page }) => {
     await page.goto("/link")
     await waitForReady(page)
 
-    // Find the "V" of "Visit opentui.dev" in the buffer
+    // Find the "V" of "Visit opentui.com" in the buffer
     // With padding=1, the text starts at col 1, and the link is on the second text line
     const text = await getBufferText(page)
     const lines = text.split("\n")
-    const linkLine = lines.findIndex((l) => l.includes("Visit opentui.dev"))
+    const linkLine = lines.findIndex((l) => l.includes("Visit opentui.com"))
     expect(linkLine).toBeGreaterThanOrEqual(0)
 
     // Verify the first character of the link text

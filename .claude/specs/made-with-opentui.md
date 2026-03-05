@@ -166,7 +166,7 @@ The following changes must be applied compared to the original ink-web versions:
 
 | Original (ink-web) | Rebranded (opentui) |
 |---------------------|---------------------|
-| URL: `https://ink-web.dev` | URL: `https://opentui.dev` (or the appropriate OpenTUI project URL) |
+| URL: `https://ink-web.dev` | URL: `https://opentui.com` (or the appropriate OpenTUI project URL) |
 | Ribbon text: `"made with ink web"` | Ribbon text: `"made with opentui"` |
 | Badge text: `"made with ink web"` | Badge text: `"made with opentui"` |
 | TextBadge text: `">_ made with ink web"` | TextBadge text: `">_ made with opentui"` |

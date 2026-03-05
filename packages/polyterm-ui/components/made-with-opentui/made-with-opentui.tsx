@@ -1,4 +1,4 @@
-const OPENTUI_URL = "https://opentui.dev"
+const OPENTUI_URL = "https://opentui.com"
 
 function cn(...classes: (string | undefined | false)[]): string {
   return classes.filter(Boolean).join(" ")

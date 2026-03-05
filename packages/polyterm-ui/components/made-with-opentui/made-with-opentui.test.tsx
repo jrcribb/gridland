@@ -51,10 +51,10 @@ describe("CornerRibbon", () => {
     expect(el.props.style.pointerEvents).toBe("none")
   })
 
-  it("renders link to opentui.dev", () => {
+  it("renders link to opentui.com", () => {
     const el = CornerRibbon({})
     const link = el.props.children
-    expect(link.props.href).toBe("https://opentui.dev")
+    expect(link.props.href).toBe("https://opentui.com")
     expect(link.props.target).toBe("_blank")
     expect(link.props.rel).toBe("noopener noreferrer")
   })
@@ -83,9 +83,9 @@ describe("BadgeButton", () => {
     expect(typeof BadgeButton).toBe("function")
   })
 
-  it("renders a link to opentui.dev", () => {
+  it("renders a link to opentui.com", () => {
     const el = BadgeButton({})
-    expect(el.props.href).toBe("https://opentui.dev")
+    expect(el.props.href).toBe("https://opentui.com")
     expect(el.props.target).toBe("_blank")
     expect(el.props.rel).toBe("noopener noreferrer")
   })
@@ -123,9 +123,9 @@ describe("TextBadge", () => {
     expect(typeof TextBadge).toBe("function")
   })
 
-  it("renders a link to opentui.dev", () => {
+  it("renders a link to opentui.com", () => {
     const el = TextBadge({})
-    expect(el.props.href).toBe("https://opentui.dev")
+    expect(el.props.href).toBe("https://opentui.com")
     expect(el.props.target).toBe("_blank")
     expect(el.props.rel).toBe("noopener noreferrer")
   })

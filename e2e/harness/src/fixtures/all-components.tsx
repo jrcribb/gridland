@@ -34,7 +34,7 @@ export function AllComponentsFixture() {
           <TextInput placeholder="Type here..." prompt="> " />
         </box>
 
-        <Link url="https://opentui.dev">Visit opentui.dev</Link>
+        <Link url="https://opentui.com">Visit opentui.com</Link>
       </box>
     </FixtureWrapper>
   )

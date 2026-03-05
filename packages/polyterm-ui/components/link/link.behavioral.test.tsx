@@ -24,7 +24,7 @@ describe("Link behavior", () => {
 
   it("renders with multi-word children", () => {
     const { screen } = renderTui(
-      <Link url="https://opentui.dev">Visit OpenTUI Documentation</Link>,
+      <Link url="https://opentui.com">Visit OpenTUI Documentation</Link>,
       { cols: 40, rows: 3 },
     )
     expect(screen.text()).toContain("Visit OpenTUI Documentation")

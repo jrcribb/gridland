@@ -15,7 +15,7 @@
 - `packages/polyterm-ui` — UI component library (@polyterm.io/ui)
 - `packages/polyterm-testing` — Testing utilities (@polyterm.io/testing)
 
-Polyterm is built on the [opentui](https://opentui.dev) engine. The underlying
+Polyterm is built on the [opentui](https://opentui.com) engine. The underlying
 `@opentui/core`, `@opentui/react`, and `@opentui/ui` packages are preserved unchanged.
 
 ## Debugging Component Rendering
