@@ -5,7 +5,7 @@ import { useKeyboard } from "@opentui/react"
 import { Logo } from "./Logo"
 import { InstallBox } from "./InstallBox"
 import { LinksBox } from "./LinksBox"
-import { SnakeGame } from "./SnakeGame"
+import { MatrixRain } from "./MatrixRain"
 import { AboutModal } from "./AboutModal"
 
 export default function LandingApp() {
@@ -14,14 +14,14 @@ export default function LandingApp() {
   const [showAbout, setShowAbout] = useState(false)
 
   useKeyboard((event: any) => {
-    if (event.key === "?" && !showAbout) {
+    if (event.name === "a" && !showAbout) {
       setShowAbout(true)
     }
   })
 
   // Reserve space for logo (~7 lines), install/links (~3 lines), statusbar (1 line), padding/gaps (~6 lines)
-  const snakeHeight = Math.max(4, height - (isTiny ? 10 : isNarrow ? 14 : 16))
-  const snakeWidth = Math.max(8, width - 4) // account for border + padding
+  const gameHeight = Math.max(4, height - (isTiny ? 10 : isNarrow ? 14 : 16))
+  const gameWidth = Math.max(8, width - 4) // account for border + padding
 
   if (showAbout) {
     return (
@@ -44,14 +44,11 @@ export default function LandingApp() {
           <InstallBox />
           <LinksBox />
         </box>
-        <SnakeGame width={snakeWidth} height={snakeHeight} />
+        <MatrixRain width={gameWidth} height={gameHeight} />
       </box>
       <StatusBar
         items={[
-          { key: "\u2190\u2191\u2193\u2192", label: "move" },
-          { key: "p", label: "pause" },
-          { key: "r", label: "restart" },
-          { key: "?", label: "about" },
+          { key: "a", label: "about" },
         ]}
       />
     </box>

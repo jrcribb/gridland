@@ -15,12 +15,14 @@ export function LinksBox() {
       flexDirection="column"
     >
       <text>
+        <span>🐱</span>
         <a href="https://github.com/cjroth/gridland" style={{ attributes: UNDERLINE, fg: theme.accent }}>
-          GitHub
+          {" GitHub"}
         </a>
         <span>{"  "}</span>
+        <span>📖</span>
         <a href="/docs" style={{ attributes: UNDERLINE, fg: theme.accent }}>
-          Docs
+          {" Docs"}
         </a>
       </text>
     </box>

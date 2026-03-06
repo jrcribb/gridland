@@ -47,10 +47,11 @@
     "**/*.mdx",
     "**/*.ts",
     "**/*.tsx",
-    ".source/**/*.ts",
-    "next-env.d.ts",
     ".next/types/**/*.ts",
-    "gridland-jsx.d.ts"
+    ".source/**/*.ts",
+    "gridland-jsx.d.ts",
+    "next-env.d.ts",
+    "dist/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

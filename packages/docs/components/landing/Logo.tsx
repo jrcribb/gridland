@@ -90,7 +90,7 @@ export function Logo({ compact, narrow, mobile }: { compact?: boolean; narrow?: 
     <>
       <text>{" "}</text>
       <box flexDirection="column" alignItems="center" width="100%">
-        <text style={textStyle({ dim: true })} opacity={taglineOpacity} wrapMode="word" textAlign="center" width="100%">{mobile ? "A framework for building terminal apps, built on OpenTUI + React. (Gridland apps, like this website, work in the browser and terminal.)" : "A framework for building terminal apps, built on OpenTUI + React.\n(Gridland apps, like this website, work in the browser and terminal.)"}</text>
+        <text style={textStyle({ dim: true })} opacity={taglineOpacity} wrapMode="word" textAlign="center" width="100%">{mobile ? "A framework for building terminal apps, built on " : "A framework for building terminal apps, built on "}<a href="https://opentui.com" style={{ attributes: 72 }}>OpenTUI</a>{mobile ? " + React. (Gridland apps, like this website, work in the browser and terminal.)" : " + React.\n(Gridland apps, like this website, work in the browser and terminal.)"}</text>
       </box>
     </>
   )
