@@ -22,6 +22,8 @@ export interface TUIProps {
   fontFamily?: string
   /** Auto-focus the canvas for keyboard input (default: true) */
   autoFocus?: boolean
+  /** Background color for the canvas (default: transparent) */
+  backgroundColor?: string
   /** Called when the renderer is ready */
   onReady?: (renderer: BrowserRenderer) => void
 }
@@ -48,6 +50,7 @@ export function TUI({
   fontSize = 14,
   fontFamily = "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace",
   autoFocus = true,
+  backgroundColor,
   onReady,
 }: TUIProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -80,7 +83,7 @@ export function TUI({
     const cols = Math.max(1, Math.floor(containerRect.width / cellSize.width))
     const rows = Math.max(1, Math.floor(containerRect.height / cellSize.height))
 
-    const renderer = new BrowserRenderer(canvas, cols, rows)
+    const renderer = new BrowserRenderer(canvas, cols, rows, { backgroundColor })
     rendererRef.current = renderer
 
     const root = createBrowserRoot(renderer)
@@ -121,7 +124,7 @@ export function TUI({
       rendererRef.current = null
       rootRef.current = null
     }
-  }, [isClient, fontSize, fontFamily]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isClient, fontSize, fontFamily, backgroundColor]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Re-render when children change
   useEffect(() => {

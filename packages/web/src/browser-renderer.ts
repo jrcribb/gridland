@@ -31,8 +31,9 @@ export class BrowserRenderer {
   private isDragOver: boolean = false
   private cleanupListeners: (() => void)[] = []
   private mouseDownCell: { col: number; row: number } | null = null
+  private backgroundColor: string | null = null
 
-  constructor(canvas: HTMLCanvasElement, cols: number, rows: number) {
+  constructor(canvas: HTMLCanvasElement, cols: number, rows: number, options?: { backgroundColor?: string }) {
     this.canvas = canvas
     this.cols = cols
     this.rows = rows
@@ -54,6 +55,8 @@ export class BrowserRenderer {
     canvas.style.width = `${cols * this.cellWidth}px`
     canvas.style.height = `${rows * this.cellHeight}px`
     this.ctx2d.scale(dpr, dpr)
+
+    this.backgroundColor = options?.backgroundColor ?? null
 
     // Text cursor for the canvas
     canvas.style.cursor = "text"
@@ -283,7 +286,12 @@ export class BrowserRenderer {
     // Paint to canvas
     const dpr = window.devicePixelRatio || 1
     this.ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0)
-    this.ctx2d.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    if (this.backgroundColor) {
+      this.ctx2d.fillStyle = this.backgroundColor
+      this.ctx2d.fillRect(0, 0, this.canvas.width, this.canvas.height)
+    } else {
+      this.ctx2d.clearRect(0, 0, this.canvas.width, this.canvas.height)
+    }
     this.painter.paint(this.ctx2d, this.buffer, this.selection)
   }
 

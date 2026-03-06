@@ -24,7 +24,7 @@ export function createBrowserRoot(renderer: BrowserRenderer): BrowserRoot {
     render(node: ReactNode) {
       const element = (
         <BrowserContext.Provider value={{ renderContext: renderer.renderContext }}>
-          <AppContext.Provider value={{ keyHandler: renderer.renderContext.keyInput as any, renderer: null }}>
+          <AppContext.Provider value={{ keyHandler: renderer.renderContext.keyInput as any, renderer: renderer.renderContext as any }}>
             <ErrorBoundary>{node}</ErrorBoundary>
           </AppContext.Provider>
         </BrowserContext.Provider>

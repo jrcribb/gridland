@@ -1,0 +1,32 @@
+// @ts-nocheck
+import { useTheme } from "@gridland/ui"
+
+const UNDERLINE = 1 << 3
+
+export function LinksBox() {
+  const theme = useTheme()
+
+  return (
+    <box
+      border
+      borderStyle="rounded"
+      borderColor={theme.border}
+      paddingX={1}
+      flexDirection="column"
+    >
+      <text>
+        <a href="https://github.com/cjroth/gridland" style={{ attributes: UNDERLINE, fg: theme.accent }}>
+          GitHub
+        </a>
+        <span>{"  "}</span>
+        <a href="/docs" style={{ attributes: UNDERLINE, fg: theme.accent }}>
+          Docs
+        </a>
+        <span>{"  "}</span>
+        <a href="https://www.npmjs.com/package/@gridland/web" style={{ attributes: UNDERLINE, fg: theme.accent }}>
+          npm
+        </a>
+      </text>
+    </box>
+  )
+}
