@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test"
 
 export default defineConfig({
   testDir: "./e2e",
+  // Visual/screenshot tests are skipped in CI because canvas rendering differs
+  // between macOS and Linux (font rendering, anti-aliasing), causing false failures.
   testIgnore: process.env.CI ? ["**/visual/**", "**/table-borders*"] : [],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
