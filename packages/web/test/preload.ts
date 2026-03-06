@@ -114,9 +114,12 @@ plugin({
       build.onLoad({ filter }, () => ({ contents, loader: "ts" }))
     }
 
-    // Deduplicate React — resolve bare "react" to our local copy.
+    // Redirect bare module imports to our local copies (opentui submodule
+    // can't resolve these from its own directory).
     const reactPath = import.meta.resolveSync("react")
     build.onResolve({ filter: /^react$/ }, () => ({ path: reactPath }))
+    const yogaPath = import.meta.resolveSync("yoga-layout")
+    build.onResolve({ filter: /^yoga-layout$/ }, () => ({ path: yogaPath }))
 
     // Intercept reconciler.ts to use our pre-loaded patched reconciler factory
     // and constants from globalThis. This avoids loading react-reconciler from
