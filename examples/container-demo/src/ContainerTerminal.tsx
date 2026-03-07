@@ -270,8 +270,8 @@ async function loadContainer(terminal: Terminal, inputBuffer: number[]): Promise
   window.prompt = () => null
 
   // Load out.js as a script. It runs synchronously, pushes runWithFS to
-  // Module.preRun (after our /pack/info write), and calls run().
-  // preRun() processes all callbacks: our info write runs first, then
+  // Module.preRun (after our cert write), and calls run().
+  // preRun() processes all callbacks: our cert write runs first, then
   // runWithFS starts the data file download and adds a run dependency.
   // run() returns early. When data files finish loading, run() resumes.
   await loadScript("/c2w/out.js")
@@ -295,6 +295,51 @@ async function loadContainer(terminal: Terminal, inputBuffer: number[]): Promise
       return undefined
     }
   })
+
+  // TinyEMU's emscripten build doesn't write env:/m: lines to the FSVirtFile
+  // (those are WASI-only). DNS also doesn't work because the browser can't
+  // forward raw UDP queries. Detect the shell prompt and inject proxy config
+  // so programs use the HTTP proxy (which resolves DNS via browser fetch()).
+  if (cert) {
+    injectProxySetup(terminal, inputBuffer)
+  }
+}
+
+/**
+ * Watch terminal output for the shell prompt, then inject proxy environment
+ * setup commands. The proxy at 192.168.127.253:80 handles DNS resolution
+ * via browser fetch(), so all HTTP/HTTPS must go through it.
+ */
+function injectProxySetup(terminal: Terminal, inputBuffer: number[]) {
+  let injected = false
+  const check = setInterval(() => {
+    if (injected) return
+    // Look for shell prompt (e.g. "/ #" or "~ #") on the cursor line
+    const cursorY = terminal.buffer.active.cursorY
+    const line = terminal.buffer.active.getLine(cursorY)
+    if (!line) return
+    const text = line.translateToString(true)
+    if (text.match(/[/#~]\s*#\s*$/)) {
+      injected = true
+      clearInterval(check)
+      // Inject proxy env vars as a single command, then clear screen
+      const cmd = [
+        "export http_proxy=http://192.168.127.253:80",
+        "export https_proxy=http://192.168.127.253:80",
+        "export HTTP_PROXY=http://192.168.127.253:80",
+        "export HTTPS_PROXY=http://192.168.127.253:80",
+        "export SSL_CERT_FILE=/mnt/wasi0/.wasmenv/proxy.crt",
+        "clear",
+      ].join(" && ")
+      pushInput(inputBuffer, cmd + "\n")
+    }
+  }, 500)
+}
+
+function pushInput(inputBuffer: number[], text: string) {
+  for (let i = 0; i < text.length; i++) {
+    inputBuffer.push(text.charCodeAt(i))
+  }
 }
 
 function loadScript(src: string): Promise<void> {

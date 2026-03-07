@@ -1,6 +1,5 @@
-import { ws } from "msw"
+import { http, passthrough, ws } from "msw"
 import { setupWorker } from "msw/browser"
-// import StackWorker from "./stack-worker?worker"
 
 let accepted = false
 let curSocket: any = null
@@ -241,9 +240,10 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
           break
         case "http_send": {
           const reqObj = JSON.parse(new TextDecoder().decode(req_.req))
-          reqObj.mode = "cors"
-          reqObj.credentials = "omit"
-          if (reqObj.headers && reqObj.headers["User-Agent"] != "") {
+          // Remove properties not needed for server-side proxy
+          delete reqObj.mode
+          delete reqObj.credentials
+          if (reqObj.headers) {
             delete reqObj.headers["User-Agent"]
           }
           const reqID = getID()
@@ -278,7 +278,19 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
             if (conn.request.method != "HEAD" && conn.request.method != "GET") {
               conn.request.body = conn.reqBodybuf
             }
-            fetch(conn.address, conn.request)
+            // Route through server-side proxy to bypass browser CORS restrictions.
+            // The browser can't fetch cross-origin resources without CORS headers,
+            // so we forward through the Vite dev server's /__proxy endpoint.
+            const proxyHeaders: Record<string, string> = {
+              "x-proxy-url": conn.address,
+              ...(conn.request.headers || {}),
+            }
+            const proxyReq: RequestInit = {
+              method: conn.request.method || "GET",
+              headers: proxyHeaders,
+              body: conn.request.body,
+            }
+            fetch("/__proxy", proxyReq)
               .then((resp) => {
                 conn.done = false
                 conn.respBodybuf = new Uint8Array(0)
@@ -350,7 +362,8 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
                   conn.done = true
                 }
               })
-              .catch((_error) => {
+              .catch((error) => {
+                console.error("[net-stack] fetch failed:", conn.address, error)
                 conn.response = new TextEncoder().encode(
                   JSON.stringify({
                     status: 503,
@@ -434,6 +447,9 @@ export async function startNetworkStack(wasmImageUrl: string): Promise<Uint8Arra
         sockSend()
       })
     }),
+    // Pass through all HTTP/HTTPS requests so MSW doesn't intercept
+    // the proxy's outbound fetch() calls to external URLs.
+    http.all("*", () => passthrough()),
   ]
 
   const worker = setupWorker(...handlers)
