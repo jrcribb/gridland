@@ -16,6 +16,7 @@ import {
   ChatPanel,
   type ChatMessage,
   type ToolCallInfo,
+  LandingApp,
 } from "../components/index"
 import figlet from "figlet"
 // @ts-ignore
@@ -422,4 +423,5 @@ export const demos: Demo[] = [
   { name: "primitives", app: () => <PrimitivesApp /> },
   { name: "chat", app: () => <ChatApp /> },
   { name: "terminal", app: () => <TerminalWindowApp /> },
+  { name: "landing", app: () => <LandingApp useKeyboard={useKeyboard} /> },
 ]

@@ -1,12 +1,13 @@
 // @ts-nocheck — OpenTUI intrinsic elements conflict with React's HTML/SVG types
 "use client"
 import { TUI } from "@gridland/web"
-import LandingApp from "@/components/landing/LandingApp"
+import { LandingApp } from "@gridland/ui"
+import { useKeyboard } from "@opentui/react"
 
 export default function HomePage() {
   return (
     <TUI style={{ width: "100vw", height: "100vh" }} backgroundColor="#1a1a2e">
-      <LandingApp />
+      <LandingApp useKeyboard={useKeyboard} />
     </TUI>
   )
 }

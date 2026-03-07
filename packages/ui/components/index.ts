@@ -53,3 +53,5 @@ export type { Theme, ThemeProviderProps } from "./theme/index"
 
 export { useBreakpoints, BREAKPOINTS } from "./breakpoints/use-breakpoints"
 export type { Breakpoints } from "./breakpoints/use-breakpoints"
+
+export { LandingApp, Logo, InstallBox, LinksBox, MatrixRain, AboutModal, useMatrix } from "./landing/index"

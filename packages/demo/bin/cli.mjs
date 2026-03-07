@@ -7,7 +7,7 @@ import { join } from "node:path";
 const AVAILABLE_DEMOS = [
   "gradient", "ascii", "table", "spinner", "select-input",
   "multi-select", "text-input", "link", "tab-bar", "status-bar",
-  "modal", "primitives", "chat", "terminal",
+  "modal", "primitives", "chat", "terminal", "landing",
 ];
 
 const name = process.argv[2];
