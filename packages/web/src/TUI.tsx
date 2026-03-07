@@ -142,15 +142,22 @@ export function TUI({
   }, [children])
 
   if (!isClient) {
-    // SSR: render headlessly and show as <pre> until client hydrates
-    setHeadlessRootRenderableClass(RootRenderable)
-    const renderer = new HeadlessRenderer({ cols: fallbackCols, rows: fallbackRows })
-    const root = createHeadlessRoot(renderer)
-    const text = root.renderToText(children)
-    root.unmount()
+    // Only run the headless render on the actual server.
+    // On the client's initial render (before useEffect sets isClient=true),
+    // we render an empty <pre> and let suppressHydrationWarning preserve
+    // the server-rendered DOM until the canvas takes over.
+    const isServer = typeof window === "undefined"
+    let text = ""
+    if (isServer) {
+      setHeadlessRootRenderableClass(RootRenderable)
+      const renderer = new HeadlessRenderer({ cols: fallbackCols, rows: fallbackRows })
+      const root = createHeadlessRoot(renderer)
+      text = root.renderToText(children)
+      root.unmount()
+    }
     return (
       <div style={style} className={className}>
-        <pre style={{ fontFamily, fontSize, margin: 0 }}>{text}</pre>
+        <pre suppressHydrationWarning style={{ fontFamily, fontSize, margin: 0 }}>{text}</pre>
       </div>
     )
   }
