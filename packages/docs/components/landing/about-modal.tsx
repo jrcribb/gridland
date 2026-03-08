@@ -1,12 +1,12 @@
 // @ts-nocheck
 import { Modal, textStyle, useTheme } from "@gridland/ui"
-import { useKeyboard } from "@opentui/react"
 
 interface AboutModalProps {
   onClose: () => void
+  useKeyboard: any
 }
 
-export function AboutModal({ onClose }: AboutModalProps) {
+export function AboutModal({ onClose, useKeyboard }: AboutModalProps) {
   const theme = useTheme()
 
   return (

@@ -1,8 +1,6 @@
 // @ts-nocheck
 import { useState } from "react"
-import { StatusBar } from "../status-bar/status-bar"
-import { useBreakpoints } from "../breakpoints/use-breakpoints"
-import { useTheme } from "../theme/index"
+import { StatusBar, useTheme, useBreakpoints } from "@gridland/ui"
 import { Logo } from "./logo"
 import { InstallBox } from "./install-box"
 import { LinksBox } from "./links-box"

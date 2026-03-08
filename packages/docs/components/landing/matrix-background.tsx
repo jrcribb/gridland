@@ -1,8 +1,7 @@
 // @ts-nocheck
 import { useMemo } from "react"
 import { useMatrix } from "./use-matrix"
-import { generateGradient, hexToRgb, rgbToHex } from "../gradient/gradient"
-import { useTheme } from "../theme"
+import { generateGradient, hexToRgb, rgbToHex, useTheme } from "@gridland/ui"
 
 interface ClearRect {
   top: number
