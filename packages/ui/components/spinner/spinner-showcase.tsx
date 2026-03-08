@@ -38,7 +38,7 @@ export function SpinnerPicker({ useKeyboard }: SpinnerPickerProps) {
       </box>
       <StatusBar
         items={[{ key: "←→", label: "change spinner type" }]}
-        extra={<span style={textStyle({ fg: theme.accent, bold: true })}>{selectedName}</span>}
+        extra={<span style={textStyle({ fg: theme.accent, bold: true })}>{selectedName.padEnd(8)}</span>}
       />
     </box>
   )
