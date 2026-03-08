@@ -57,14 +57,15 @@ export function MatrixBackground({ width, height, clearRect }: MatrixBackgroundP
             const inClearRect = clearRect &&
               y >= clearRect.top && y < clearRect.top + clearRect.height &&
               x >= clearRect.left && x < clearRect.left + clearRect.width
-            if (cell === " " || inClearRect) {
+            const baseColor = columnColors[x]
+            if (cell === " " || inClearRect || !baseColor) {
               return <span key={x}>{" "}</span>
             }
             return (
               <span
                 key={x}
                 style={{
-                  fg: colorForCell(columnColors[x], brightness[y][x]),
+                  fg: colorForCell(baseColor, brightness[y][x]),
                 }}
               >
                 {cell}
