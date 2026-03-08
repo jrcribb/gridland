@@ -65,7 +65,7 @@ function sockSend() {
   }
 
   if (len + round < data.length) {
-    console.log("FIXME: buffer full; dropping packets")
+    console.warn("[net-stack] Buffer full; dropping packets")
   } else {
     if (len > 0) {
       if (len > data.length) len = data.length
@@ -80,7 +80,7 @@ function sockSend() {
   }
 
   if (Atomics.compareExchange(toNetCtrl, 0, 1, 0) != 1) {
-    console.log("UNEXPECTED STATUS")
+    console.error("[net-stack] Unexpected buffer status")
   }
   Atomics.notify(toNetCtrl, 0, 1)
   Atomics.store(toNetNotify, 0, 1)
@@ -91,7 +91,7 @@ function sockRecvWS(targetLen: number) {
   if (!accepted) return -1
 
   if (Atomics.compareExchange(fromNetCtrl, 0, 0, 1) != 0) {
-    sockRecvWS(targetLen)
+    setTimeout(() => sockRecvWS(targetLen), 0)
     return
   }
 
@@ -126,7 +126,7 @@ function sockRecvWS(targetLen: number) {
   curSocket.send(targetBuf)
 
   if (Atomics.compareExchange(fromNetCtrl, 0, 1, 0) != 1) {
-    console.log("UNEXPECTED STATUS")
+    console.error("[net-stack] Unexpected buffer status")
   }
   Atomics.notify(fromNetCtrl, 0, 1)
 
@@ -186,6 +186,35 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
     streamLen[0] = buf.byteLength
     streamData.set(buf, 0)
     return remain
+  }
+
+  function serializeResponse(resp: Response, headers: Record<string, string>): Uint8Array {
+    return new TextEncoder().encode(
+      JSON.stringify({
+        bodyUsed: resp.bodyUsed,
+        headers,
+        redirected: resp.redirected,
+        status: resp.status,
+        statusText: resp.statusText,
+        type: resp.type,
+        url: resp.url,
+      }),
+    )
+  }
+
+  function collectHeaders(resp: Response, overrides?: { bodyLength?: number }): Record<string, string> {
+    const headers: Record<string, string> = {}
+    for (const key of resp.headers.keys()) {
+      if (overrides?.bodyLength != null && overrides.bodyLength > 0) {
+        if (key === "content-encoding") continue
+        if (key === "content-length") {
+          headers[key] = overrides.bodyLength.toString()
+          continue
+        }
+      }
+      headers[key] = resp.headers.get(key)!
+    }
+    return headers
   }
 
   const toNetNotifyView = new Int32Array(toNet, 12, 1)
@@ -248,7 +277,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
           }
           const reqID = getID()
           if (reqID < 0) {
-            console.log("failed to get id")
+            console.error("[net-stack] Failed to allocate connection ID")
             streamStatus[0] = -1
             break
           }
@@ -268,107 +297,49 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
         case "http_writebody": {
           const conn = httpConnections[req_.id]
           if (conn == undefined) {
-            conn.reqBodybuf = new Uint8Array(0)
+            streamStatus[0] = -1
+            break
           }
-          httpConnections[req_.id].reqBodybuf = appendData(conn.reqBodybuf, req_.body)
-          httpConnections[req_.id].reqBodyEOF = req_.isEOF
+          conn.reqBodybuf = appendData(conn.reqBodybuf, req_.body)
+          conn.reqBodyEOF = req_.isEOF
           streamStatus[0] = 0
           if (req_.isEOF && !conn.requestSent) {
             conn.requestSent = true
-            if (conn.request.method != "HEAD" && conn.request.method != "GET") {
+            if (conn.request.method !== "HEAD" && conn.request.method !== "GET") {
               conn.request.body = conn.reqBodybuf
             }
             // Route through server-side proxy to bypass browser CORS restrictions.
-            // The browser can't fetch cross-origin resources without CORS headers,
-            // so we forward through the Vite dev server's /__proxy endpoint.
             const proxyHeaders: Record<string, string> = {
               "x-proxy-url": conn.address,
               ...(conn.request.headers || {}),
             }
-            const proxyReq: RequestInit = {
+            fetch("/__proxy", {
               method: conn.request.method || "GET",
               headers: proxyHeaders,
               body: conn.request.body,
-            }
-            fetch("/__proxy", proxyReq)
-              .then((resp) => {
+            })
+              .then(async (resp) => {
                 conn.done = false
                 conn.respBodybuf = new Uint8Array(0)
                 if (resp.ok) {
-                  resp
-                    .arrayBuffer()
-                    .then((data) => {
-                      const headers: Record<string, string> = {}
-                      for (const key of resp.headers.keys()) {
-                        if (data.byteLength > 0) {
-                          if (key == "content-encoding") continue
-                          if (key == "content-length") {
-                            headers[key] = data.byteLength.toString()
-                            continue
-                          }
-                        }
-                        headers[key] = resp.headers.get(key)!
-                      }
-                      conn.response = new TextEncoder().encode(
-                        JSON.stringify({
-                          bodyUsed: resp.bodyUsed,
-                          headers,
-                          redirected: resp.redirected,
-                          status: resp.status,
-                          statusText: resp.statusText,
-                          type: resp.type,
-                          url: resp.url,
-                        }),
-                      )
-                      conn.respBodybuf = new Uint8Array(data)
-                      conn.done = true
-                    })
-                    .catch((error) => {
-                      const headers: Record<string, string> = {}
-                      for (const key of resp.headers.keys()) {
-                        headers[key] = resp.headers.get(key)!
-                      }
-                      conn.response = new TextEncoder().encode(
-                        JSON.stringify({
-                          bodyUsed: resp.bodyUsed,
-                          headers,
-                          redirected: resp.redirected,
-                          status: resp.status,
-                          statusText: resp.statusText,
-                          type: resp.type,
-                          url: resp.url,
-                        }),
-                      )
-                      conn.respBodybuf = new Uint8Array(0)
-                      conn.done = true
-                      console.log("failed to fetch body: " + error)
-                    })
-                } else {
-                  const headers: Record<string, string> = {}
-                  for (const key of resp.headers.keys()) {
-                    headers[key] = resp.headers.get(key)!
+                  try {
+                    const data = await resp.arrayBuffer()
+                    conn.response = serializeResponse(resp, collectHeaders(resp, { bodyLength: data.byteLength }))
+                    conn.respBodybuf = new Uint8Array(data)
+                  } catch (error) {
+                    console.error("[net-stack] Failed to read response body:", error)
+                    conn.response = serializeResponse(resp, collectHeaders(resp))
+                    conn.respBodybuf = new Uint8Array(0)
                   }
-                  conn.response = new TextEncoder().encode(
-                    JSON.stringify({
-                      bodyUsed: resp.bodyUsed,
-                      headers,
-                      redirected: resp.redirected,
-                      status: resp.status,
-                      statusText: resp.statusText,
-                      type: resp.type,
-                      url: resp.url,
-                    }),
-                  )
-                  conn.done = true
+                } else {
+                  conn.response = serializeResponse(resp, collectHeaders(resp))
                 }
+                conn.done = true
               })
               .catch((error) => {
-                console.error("[net-stack] fetch failed:", conn.address, error)
+                console.error("[net-stack] Fetch failed:", conn.address, error)
                 conn.response = new TextEncoder().encode(
-                  JSON.stringify({
-                    status: 503,
-                    statusText: "Service Unavailable",
-                  }),
+                  JSON.stringify({ status: 503, statusText: "Service Unavailable" }),
                 )
                 conn.respBodybuf = new Uint8Array(0)
                 conn.done = true
@@ -386,7 +357,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
           break
         case "http_recv":
           if (httpConnections[req_.id] == undefined || httpConnections[req_.id].response == null) {
-            console.log("response is not available")
+            console.error("[net-stack] Response not available for connection", req_.id)
             streamStatus[0] = -1
             break
           }
@@ -398,7 +369,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
           break
         case "http_readbody":
           if (httpConnections[req_.id] == undefined || httpConnections[req_.id].response == null) {
-            console.log("response body is not available")
+            console.error("[net-stack] Response body not available for connection", req_.id)
             streamStatus[0] = -1
             break
           }
@@ -415,7 +386,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
           streamStatus[0] = 0
           break
         default:
-          console.log("unknown request: " + req_.type)
+          console.warn("[net-stack] Unknown request type:", req_.type)
           return
       }
       Atomics.store(streamCtrl, 0, 1)

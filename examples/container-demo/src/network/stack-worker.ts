@@ -1,10 +1,7 @@
-console.log("[stack-worker] Module loading...")
-
 import { WASI } from "@bjorn3/browser_wasi_shim"
 import * as wasitype from "@bjorn3/browser_wasi_shim"
 import { Event, EventType, Subscription, wasiHackSocket } from "./wasi-util"
 
-console.log("[stack-worker] Imports resolved, worker ready")
 postMessage({ type: "ready" })
 
 const ERRNO_INVAL = 28
@@ -86,7 +83,7 @@ function sockSend(data: Uint8Array): number {
   }
 
   if (len + round < data.length) {
-    console.log("FIXME: buffer full; dropping packets")
+    console.warn("[stack-worker] Buffer full; dropping packets")
   } else {
     if (len > 0) {
       if (len > data.length) len = data.length
@@ -101,7 +98,7 @@ function sockSend(data: Uint8Array): number {
   }
 
   if (Atomics.compareExchange(fromNetCtrl, 0, 1, 0) != 1) {
-    console.log("UNEXPECTED STATUS")
+    console.error("[stack-worker] Unexpected buffer status")
   }
   Atomics.notify(fromNetCtrl, 0, 1)
 
@@ -149,7 +146,7 @@ function sockRecv(targetBuf: Uint8Array, targetOffset: number, targetLen: number
   }
 
   if (Atomics.compareExchange(toNetCtrl, 0, 1, 0) != 1) {
-    console.log("UNEXPECTED STATUS")
+    console.error("[stack-worker] Unexpected buffer status")
   }
   Atomics.notify(toNetCtrl, 0, 1)
 
@@ -181,7 +178,7 @@ function sockWaitForReadable(timeout: number): boolean | typeof errStatus {
   const ready = (len + round) > 0
 
   if (Atomics.compareExchange(toNetCtrl, 0, 1, 0) != 1) {
-    console.log("UNEXPECTED STATUS")
+    console.error("[stack-worker] Unexpected buffer status")
   }
   Atomics.notify(toNetCtrl, 0, 1)
 
@@ -250,7 +247,6 @@ function wasiHack(wasi: any, certfd: number, connfd: number) {
         const iovec = iovecs[i]
         const buf = buffer8.slice(iovec.buf, iovec.buf + iovec.buf_len)
         if (buf.length == 0) continue
-        console.log(new TextDecoder().decode(buf))
         if (fd == certfd) {
           certbuf = appendData(certbuf, buf)
         }
@@ -259,7 +255,7 @@ function wasiHack(wasi: any, certfd: number, connfd: number) {
       buffer.setUint32(nwritten_ptr, wtotal, true)
       return 0
     }
-    console.log("fd_write: unknown fd " + fd)
+    console.warn("[stack-worker] fd_write: unknown fd", fd)
     return _fd_write.apply(wasi.wasiImport, [fd, iovs_ptr, iovs_len, nwritten_ptr])
   }
 
@@ -402,7 +398,7 @@ self.onmessage = (msg: MessageEvent) => {
   const req_ = msg.data
   if (typeof req_ != "object" || req_.type != "init") return
 
-  console.log("[stack-worker] init received, setting up buffers...")
+  console.log("[stack-worker] Initializing...")
 
   if (req_.buf) {
     registerSocketBuffer(req_.buf)
@@ -426,26 +422,20 @@ self.onmessage = (msg: MessageEvent) => {
   wasiHack(wasi, certfd, connfd)
   wasiHackSocket(wasi, listenfd, connfd, sockAccept, sockSend, sockRecv)
 
-  console.log("[stack-worker] Fetching c2w-net-proxy.wasm from:", req_.stackWasmURL)
+  console.log("[stack-worker] Loading c2w-net-proxy.wasm from:", req_.stackWasmURL)
   fetch(req_.stackWasmURL)
-    .then((resp) => {
-      console.log("[stack-worker] Fetch response:", resp.status, resp.statusText)
-      return resp.blob()
-    })
+    .then((resp) => resp.blob())
     .then((blob) => {
-      console.log("[stack-worker] Decompressing gzip, blob size:", blob.size)
       const ds = new DecompressionStream("gzip")
       return new Response(blob.stream().pipeThrough(ds)).arrayBuffer()
     })
-    .then((wasm) => {
-      console.log("[stack-worker] WASM decompressed, size:", wasm.byteLength, "- instantiating...")
-      WebAssembly.instantiate(wasm, {
+    .then(async (wasm) => {
+      const inst = await WebAssembly.instantiate(wasm, {
         wasi_snapshot_preview1: wasi.wasiImport,
         env: envHack(wasi),
-      }).then((inst) => {
-        console.log("[stack-worker] WASM instantiated, starting...")
-        wasi.start(inst.instance as any)
       })
+      console.log("[stack-worker] WASM instantiated, starting...")
+      wasi.start(inst.instance as any)
     })
     .catch((err) => {
       console.error("[stack-worker] Failed to load c2w-net-proxy:", err)

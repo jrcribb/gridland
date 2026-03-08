@@ -16,7 +16,7 @@ export class EventType {
       case wasitype.wasi.EVENTTYPE_FD_WRITE:
         return new EventType("fd_write")
       default:
-        throw "Invalid event type " + String(data)
+        throw new Error("Invalid event type " + String(data))
     }
   }
 
@@ -29,7 +29,7 @@ export class EventType {
       case "fd_write":
         return wasitype.wasi.EVENTTYPE_FD_WRITE
       default:
-        throw "unreachable"
+        throw new Error("unreachable")
     }
   }
 }
@@ -89,7 +89,7 @@ export class SubscriptionU {
         self.data = SubscriptionFdReadWrite.read_bytes(view, ptr + 8)
         break
       default:
-        throw "unreachable"
+        throw new Error("unreachable")
     }
     return self
   }
