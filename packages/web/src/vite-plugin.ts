@@ -20,11 +20,19 @@ export function gridlandWebPlugin(): Plugin[] {
   const pkgRoot = path.resolve(__dirname, "..")
   const _require = createRequire(path.resolve(pkgRoot, "package.json"))
 
-  // Resolve opentui package roots from the git submodule
-  const opentuiRoot = path.resolve(pkgRoot, "../../opentui")
-  const coreRoot = path.resolve(opentuiRoot, "packages/core")
-  const reactRoot = path.resolve(opentuiRoot, "packages/react")
-  const uiRoot = path.resolve(opentuiRoot, "packages/ui")
+  // Resolve opentui package roots — try installed packages first,
+  // fall back to git submodule for monorepo development
+  function resolvePackageRoot(pkg: string, fallbackRelative: string): string {
+    try {
+      const pkgJson = _require.resolve(`${pkg}/package.json`)
+      return path.dirname(pkgJson)
+    } catch {
+      return path.resolve(pkgRoot, fallbackRelative)
+    }
+  }
+  const coreRoot = resolvePackageRoot("@opentui/core", "../../opentui/packages/core")
+  const reactRoot = resolvePackageRoot("@opentui/react", "../../opentui/packages/react")
+  const uiRoot = resolvePackageRoot("@opentui/ui", "../../opentui/packages/ui")
 
   const coreShims = path.resolve(pkgRoot, "src/core-shims/index.ts")
   const opentuiCoreBarrel = path.resolve(coreRoot, "src/index.ts")

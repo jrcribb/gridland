@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { BrowserRenderer, setRootRenderableClass } from "./browser-renderer"
 import { createBrowserRoot } from "./create-browser-root"
 import { CanvasPainter } from "./canvas-painter"
+import { RootRenderable } from "@opentui/core"
 
 export interface MountOptions {
   /** Number of columns (auto-calculated from canvas size if omitted) */
@@ -45,8 +46,6 @@ export function mountGridland(
   } = options
 
   // Set up RootRenderable
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { RootRenderable } = require("@opentui/core")
   setRootRenderableClass(RootRenderable)
 
   // Calculate grid dimensions

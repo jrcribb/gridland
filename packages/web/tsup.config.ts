@@ -1,50 +1,21 @@
 import { defineConfig } from "tsup"
-import type { Plugin } from "esbuild"
-
-// Browser entries import opentui engine code via relative paths and
-// @opentui/* bare specifiers. These rely on the Vite/Next.js plugin for
-// proper module resolution (zig stubs, tree-sitter stubs, etc.).
-// Externalize them so the tsup build succeeds — consumers always use
-// these entries through Vite or Next.js which handle resolution.
-const externalOpentui: Plugin = {
-  name: "external-opentui",
-  setup(build) {
-    // Bare @opentui/* imports (e.g. require("@opentui/core") in mount.ts)
-    build.onResolve({ filter: /^@opentui\// }, (args) => ({
-      path: args.path,
-      external: true,
-    }))
-    // Relative imports reaching into the external opentui monorepo
-    build.onResolve({ filter: /opentui\/packages/ }, (args) => ({
-      path: args.path,
-      external: true,
-    }))
-  },
-}
 
 export default defineConfig([
-  // Main bundle (browser runtime)
+  // DTS-only for browser entries (JS built by build-browser.mjs via esbuild directly,
+  // because tsup's internal plugins intercept bun:ffi and node built-ins before
+  // user plugins can shim them)
   {
-    entry: { index: "src/index.ts" },
+    entry: { index: "src/index.ts", next: "src/next.ts" },
     format: ["esm"],
-    dts: true,
-    sourcemap: true,
-    clean: true,
-    external: ["react", "react-dom"],
-    esbuildPlugins: [externalOpentui],
+    dts: { only: true },
+    external: [
+      "react", "react-dom", "react-devtools-core",
+      /^@opentui\//, /^bun/, "events",
+      "fs", "fs/promises", "path", "os", "stream", "url", "util",
+      /^node:/, /tree-sitter/, /hast-styled-text/, /bun-ffi-structs/,
+    ],
     target: "esnext",
-    platform: "browser",
-  },
-  // Core bundle (smaller, for use with Vite plugin)
-  {
-    entry: { core: "src/core.ts" },
-    format: ["esm"],
-    dts: true,
-    sourcemap: true,
-    external: ["react", "react-dom"],
-    esbuildPlugins: [externalOpentui],
-    target: "esnext",
-    platform: "browser",
+    platform: "neutral",
   },
   // Vite plugin (Node.js)
   {
@@ -52,21 +23,10 @@ export default defineConfig([
     format: ["esm"],
     dts: true,
     sourcemap: true,
-    external: ["vite", "path"],
+    clean: true,
+    external: ["vite", "path", "module", "url"],
     target: "node18",
     platform: "node",
-  },
-  // Next.js export
-  {
-    entry: { next: "src/next.ts" },
-    format: ["esm"],
-    dts: true,
-    sourcemap: true,
-    external: ["react", "react-dom"],
-    esbuildPlugins: [externalOpentui],
-    target: "esnext",
-    platform: "browser",
-    banner: { js: '"use client";' },
   },
   // Next.js plugin (Node.js, ESM + CJS since Next.js loads config via require())
   {
