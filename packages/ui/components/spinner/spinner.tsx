@@ -26,11 +26,12 @@ export function Spinner({ variant = "dots", text, color }: SpinnerProps) {
   const [frame, setFrame] = useState(0)
 
   useEffect(() => {
+    setFrame(0)
     const timer = setInterval(() => {
       setFrame((prev) => (prev + 1) % frames.length)
     }, interval)
     return () => clearInterval(timer)
-  }, [frames.length, interval])
+  }, [variant])
 
   return (
     <text>
