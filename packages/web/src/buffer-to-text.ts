@@ -1,6 +1,10 @@
-import type { BrowserBuffer } from "./browser-buffer"
+export interface ReadableCharBuffer {
+  width: number
+  height: number
+  char: Uint32Array
+}
 
-export function bufferToText(buffer: BrowserBuffer): string {
+export function bufferToText(buffer: ReadableCharBuffer): string {
   const lines: string[] = []
   for (let row = 0; row < buffer.height; row++) {
     let line = ""
