@@ -22,12 +22,12 @@ const landArt = makeArt("land")
 const ART_HEIGHT = 6 // ANSI Shadow font produces 6 lines
 
 function useAnimation(duration = 1000) {
-  const hasRAF = typeof requestAnimationFrame !== "undefined"
-  const [progress, setProgress] = useState(hasRAF ? 0 : 1)
+  const isBrowser = typeof document !== "undefined"
+  const [progress, setProgress] = useState(isBrowser ? 0 : 1)
   const startTime = useRef<number | null>(null)
 
   useEffect(() => {
-    if (!hasRAF) return
+    if (!isBrowser) return
     let raf: number
     const tick = (time: number) => {
       if (startTime.current === null) startTime.current = time
@@ -107,7 +107,7 @@ function RevealGradient({ children, revealCol }: { children: string; revealCol: 
 }
 
 export function Logo({ compact, narrow, mobile }: { compact?: boolean; narrow?: boolean; mobile?: boolean }) {
-  const hasRAF = typeof requestAnimationFrame !== "undefined"
+  const isBrowser = typeof document !== "undefined"
   const progress = useAnimation(900)
 
   // Drop: animate top offset from -ART_HEIGHT to 0
@@ -131,12 +131,12 @@ export function Logo({ compact, narrow, mobile }: { compact?: boolean; narrow?: 
   )
 
   // In CLI mode (no requestAnimationFrame), render without overflow/position wrappers
-  if (!hasRAF) {
+  if (!isBrowser) {
     const art = compact ? "gridland" : narrow ? gridArt + "\n" + landArt : fullArt
     return (
-      <box flexDirection="column" flexShrink={0}>
+      <box flexDirection="column" flexShrink={0} width="100%" alignItems="center">
         <Gradient name="instagram">{art}</Gradient>
-        <text style={textStyle({ dim: true })}>A framework for building terminal apps, built on OpenTUI + React.{"\n"}(Gridland apps, like this website, work in the browser and terminal.)</text>
+        <text style={textStyle({ dim: true })} wrapMode="word" textAlign="center" width="100%">A framework for building terminal apps, built on OpenTUI + React.{"\n"}(Gridland apps, like this website, work in the browser and terminal.)</text>
       </box>
     )
   }

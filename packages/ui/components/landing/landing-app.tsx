@@ -35,15 +35,24 @@ export function LandingApp({ useKeyboard }: LandingAppProps) {
     )
   }
 
+  // Approximate the bordered box position:
+  // paddingTop(3) + logo(~7 for full, ~13 for narrow, ~2 for tiny) + gap + install/links(3) + gap
+  const logoHeight = isTiny ? 2 : isNarrow ? 13 : 7
+  const gap = isMobile ? 0 : 1
+  const boxTop = 3 + logoHeight + gap + 3 + gap + 1
+  // paddingLeft(1) to paddingRight(1), statusbar takes 1 row at bottom
+  const boxHeight = height - boxTop - 1 - 1
+  const clearRect = { top: boxTop, left: 1, width: width - 2, height: boxHeight }
+
   return (
     <box width="100%" height="100%" position="relative">
-      <MatrixBackground width={width} height={height} />
+      <MatrixBackground width={width} height={height} clearRect={clearRect} />
       <box
         position="absolute"
         top={0}
         left={0}
-        width="100%"
-        height="100%"
+        width={width}
+        height={height}
         zIndex={1}
         flexDirection="column"
         shouldFill={false}
@@ -61,7 +70,6 @@ export function LandingApp({ useKeyboard }: LandingAppProps) {
             border
             borderStyle="rounded"
             borderColor={theme.border}
-            shouldFill={false}
           />
         </box>
         <StatusBar

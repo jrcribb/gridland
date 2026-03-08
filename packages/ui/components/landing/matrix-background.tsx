@@ -1,41 +1,70 @@
 // @ts-nocheck
+import { useMemo } from "react"
 import { useMatrix } from "./use-matrix"
+import { generateGradient, GRADIENTS } from "../gradient/gradient"
 
-interface MatrixBackgroundProps {
+interface ClearRect {
+  top: number
+  left: number
   width: number
   height: number
 }
 
-const MUTED_GREENS = [
-  "#0a1a0a",
-  "#0d2a0d",
-  "#103510",
-  "#154015",
-  "#1a4a1a",
-]
-
-function greenForBrightness(b: number): string {
-  if (b >= 1.0) return MUTED_GREENS[4]
-  const idx = Math.min(Math.floor(b * (MUTED_GREENS.length - 1)), MUTED_GREENS.length - 2)
-  return MUTED_GREENS[idx]
+interface MatrixBackgroundProps {
+  width: number
+  height: number
+  /** Rectangular area to exclude from matrix rendering */
+  clearRect?: ClearRect
 }
 
-export function MatrixBackground({ width, height }: MatrixBackgroundProps) {
+// Mix a hex color with the page background, then lighten slightly
+// factor 0 = invisible, 1 = full color
+function mute(hex: string, factor: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  // Page background is #1a1a2e
+  const br = 0x1a, bg = 0x1a, bb = 0x2e
+  const mr = Math.round(br + (r - br) * factor)
+  const mg = Math.round(bg + (g - bg) * factor)
+  const mb = Math.round(bb + (b - bb) * factor)
+  return `#${mr.toString(16).padStart(2, "0")}${mg.toString(16).padStart(2, "0")}${mb.toString(16).padStart(2, "0")}`
+}
+
+// Brightness levels — subtle tints above the page background
+const MUTE_LEVELS = [0.12, 0.18, 0.24, 0.30, 0.38]
+
+function colorForCell(baseHex: string, b: number): string {
+  if (b >= 1.0) return mute(baseHex, MUTE_LEVELS[4])
+  const idx = Math.min(Math.floor(b * (MUTE_LEVELS.length - 1)), MUTE_LEVELS.length - 2)
+  return mute(baseHex, MUTE_LEVELS[idx])
+}
+
+export function MatrixBackground({ width, height, clearRect }: MatrixBackgroundProps) {
   const { grid, brightness } = useMatrix(width, height)
+
+  // Generate a gradient across the full width matching the logo palette
+  const columnColors = useMemo(
+    () => (width > 0 ? generateGradient(GRADIENTS.instagram, width) : []),
+    [width],
+  )
 
   return (
     <box flexDirection="column">
       {grid.map((row, y) => (
         <text key={y}>
           {row.map((cell, x) => {
-            if (cell === " ") {
-              return <span key={x}>{cell}</span>
+            const inClearRect = clearRect &&
+              y >= clearRect.top && y < clearRect.top + clearRect.height &&
+              x >= clearRect.left && x < clearRect.left + clearRect.width
+            if (cell === " " || inClearRect) {
+              return <span key={x}>{" "}</span>
             }
             return (
               <span
                 key={x}
                 style={{
-                  fg: greenForBrightness(brightness[y][x]),
+                  fg: colorForCell(columnColors[x], brightness[y][x]),
                 }}
               >
                 {cell}
