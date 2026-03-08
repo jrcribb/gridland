@@ -82,7 +82,7 @@ export function ContainerTerminal({ rendererRef }: ContainerTerminalProps) {
 
     canvas.addEventListener("keydown", onKeyDown, true)
     return () => canvas.removeEventListener("keydown", onKeyDown, true)
-  })
+  }, [rendererRef])
 
   // Handle terminal resize when gridland container resizes
   useEffect(() => {
@@ -109,7 +109,7 @@ export function ContainerTerminal({ rendererRef }: ContainerTerminalProps) {
     observer.observe(container)
 
     return () => observer.disconnect()
-  })
+  }, [rendererRef])
 
   const rows = useXtermBuffer(terminalRef.current)
 
@@ -200,7 +200,7 @@ async function loadContainer(terminal: Terminal, inputBuffer: number[]): Promise
       setTimeout(() => reject(new Error("Network stack timed out after 30s")), 30000),
     )
     cert = await Promise.race([startNetworkStack(wasmImageUrl), timeout])
-    console.log("[container] Network stack ready, cert received:", cert.byteLength, "bytes")
+    // cert received successfully
   } catch (err) {
     console.warn("[container] Network stack failed, booting without networking:", err)
   }
@@ -208,10 +208,9 @@ async function loadContainer(terminal: Terminal, inputBuffer: number[]): Promise
   // TinyEMU's c2w fork handles /pack/info internally via FSVirtFile.
   // We pass -net socket to create the virtio-net device and -mac for the MAC address.
   // TinyEMU writes n: and t: lines to the info file automatically.
-  const mac = cert ? genmac() : undefined
   const moduleArgs: string[] = []
   if (cert) {
-    moduleArgs.push("-net", "socket", "-mac", mac!)
+    moduleArgs.push("-net", "socket", "-mac", genmac())
   }
 
   // Set up Module global before loading the script.
@@ -255,7 +254,6 @@ async function loadContainer(terminal: Terminal, inputBuffer: number[]): Promise
           const FS = mod.FS
           try { FS.mkdir("/.wasmenv") } catch (_e) { /* may exist */ }
           FS.writeFile("/.wasmenv/proxy.crt", cert)
-          console.log("[container] Wrote cert to /.wasmenv/proxy.crt")
         }
       },
     ],
@@ -266,7 +264,6 @@ async function loadContainer(terminal: Terminal, inputBuffer: number[]): Promise
   // Suppress window.prompt — the default TTY get_char falls back to it,
   // which would show a blocking dialog. Our patched get_char handles stdin
   // via Asyncify instead.
-  ;(window as any).__originalPrompt = window.prompt
   window.prompt = () => null
 
   // Load out.js as a script. It runs synchronously, pushes runWithFS to

@@ -21,12 +21,6 @@ let fromNetBegin: Int32Array
 let fromNetEnd: Int32Array
 let fromNetData: Uint8Array
 
-let metaFromNetCtrl: Int32Array
-let metaFromNetBegin: Int32Array
-let metaFromNetEnd: Int32Array
-let metaFromNetStatus: Int32Array
-let metaFromNetData: Uint8Array
-
 const errStatus = { val: 0 }
 let accepted = false
 
@@ -49,13 +43,8 @@ function registerConnBuffer(to: SharedArrayBuffer, from: SharedArrayBuffer) {
   fromNetData = new Uint8Array(from, 12)
 }
 
-function registerMetaBuffer(meta: SharedArrayBuffer) {
-  metaFromNetCtrl = new Int32Array(meta, 0, 1)
-  metaFromNetBegin = new Int32Array(meta, 4, 1)
-  metaFromNetEnd = new Int32Array(meta, 8, 1)
-  metaFromNetStatus = new Int32Array(meta, 12, 1)
-  metaFromNetData = new Uint8Array(meta, 16)
-}
+// Meta buffer is initialized by the main thread; worker doesn't read it directly.
+function registerMetaBuffer(_meta: SharedArrayBuffer) {}
 
 function sockAccept(): boolean {
   accepted = true
@@ -398,8 +387,6 @@ self.onmessage = (msg: MessageEvent) => {
   const req_ = msg.data
   if (typeof req_ != "object" || req_.type != "init") return
 
-  console.log("[stack-worker] Initializing...")
-
   if (req_.buf) {
     registerSocketBuffer(req_.buf)
     registerConnBuffer(req_.toBuf, req_.fromBuf)
@@ -422,7 +409,6 @@ self.onmessage = (msg: MessageEvent) => {
   wasiHack(wasi, certfd, connfd)
   wasiHackSocket(wasi, listenfd, connfd, sockAccept, sockSend, sockRecv)
 
-  console.log("[stack-worker] Loading c2w-net-proxy.wasm from:", req_.stackWasmURL)
   fetch(req_.stackWasmURL)
     .then((resp) => resp.blob())
     .then((blob) => {
@@ -434,7 +420,6 @@ self.onmessage = (msg: MessageEvent) => {
         wasi_snapshot_preview1: wasi.wasiImport,
         env: envHack(wasi),
       })
-      console.log("[stack-worker] WASM instantiated, starting...")
       wasi.start(inst.instance as any)
     })
     .catch((err) => {

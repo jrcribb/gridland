@@ -175,11 +175,11 @@ export function wasiHackSocket(
 
   wasi.wasiImport.sock_accept = (fd: number, _flags: number, fd_ptr: number) => {
     if (fd != listenfd) {
-      console.log("sock_accept: unknown fd " + fd)
+      console.warn("sock_accept: unknown fd", fd)
       return ERRNO_INVAL
     }
     if (connfdUsed) {
-      console.log("sock_accept: multi-connection is unsupported")
+      console.warn("sock_accept: multi-connection is unsupported")
       return ERRNO_INVAL
     }
     if (!sockAcceptFn()) {
@@ -193,7 +193,7 @@ export function wasiHackSocket(
 
   wasi.wasiImport.sock_send = (fd: number, iovs_ptr: number, iovs_len: number, _si_flags: number, nwritten_ptr: number) => {
     if (fd != connfd) {
-      console.log("sock_send: unknown fd " + fd)
+      console.warn("sock_send: unknown fd", fd)
       return ERRNO_INVAL
     }
     const buffer = new DataView(wasi.inst.exports.memory.buffer)
@@ -213,10 +213,10 @@ export function wasiHackSocket(
 
   wasi.wasiImport.sock_recv = (fd: number, iovs_ptr: number, iovs_len: number, ri_flags: number, nread_ptr: number, _ro_flags_ptr: number) => {
     if (ri_flags != 0) {
-      console.log("ri_flags are unsupported")
+      console.warn("ri_flags are unsupported")
     }
     if (fd != connfd) {
-      console.log("sock_recv: unknown fd " + fd)
+      console.warn("sock_recv: unknown fd", fd)
       return ERRNO_INVAL
     }
     const buffer = new DataView(wasi.inst.exports.memory.buffer)

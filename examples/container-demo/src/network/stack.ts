@@ -14,12 +14,6 @@ let fromNetCtrl: Int32Array
 let fromNetBegin: Int32Array
 let fromNetEnd: Int32Array
 let fromNetData: Uint8Array
-let metaFromNetCtrl: Int32Array
-let metaFromNetBegin: Int32Array
-let metaFromNetEnd: Int32Array
-let metaFromNetStatus: Int32Array
-let metaFromNetData: Uint8Array
-
 function registerConnBuffer(to: SharedArrayBuffer, from: SharedArrayBuffer) {
   toNetCtrl = new Int32Array(to, 0, 1)
   toNetBegin = new Int32Array(to, 4, 1)
@@ -32,13 +26,9 @@ function registerConnBuffer(to: SharedArrayBuffer, from: SharedArrayBuffer) {
   fromNetData = new Uint8Array(from, 12)
 }
 
-function registerMetaBuffer(meta: SharedArrayBuffer) {
-  metaFromNetCtrl = new Int32Array(meta, 0, 1)
-  metaFromNetBegin = new Int32Array(meta, 4, 1)
-  metaFromNetEnd = new Int32Array(meta, 8, 1)
-  metaFromNetStatus = new Int32Array(meta, 12, 1)
-  metaFromNetData = new Uint8Array(meta, 16)
-}
+// Meta buffer is registered but only used by the worker side.
+// We keep the function to maintain the shared buffer initialization contract.
+function registerMetaBuffer(_meta: SharedArrayBuffer) {}
 
 function sockAccept() {
   accepted = true
@@ -51,7 +41,14 @@ function sockSend() {
     return
   }
 
-  const data = eventQueue.shift()!
+  const data = eventQueue.shift()
+  if (!data) {
+    if (Atomics.compareExchange(toNetCtrl, 0, 1, 0) != 1) {
+      console.error("[net-stack] Unexpected buffer status")
+    }
+    Atomics.notify(toNetCtrl, 0, 1)
+    return
+  }
   let begin = toNetBegin[0]
   let end = toNetEnd[0]
   let len: number
@@ -227,7 +224,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
       switch (req_.type) {
         case "recv-is-readable-cancel":
           if (timeoutHandler) {
-            clearTimeout(timeoutHandler)
+            clearInterval(timeoutHandler)
             timeoutHandler = null
           }
           break
@@ -239,7 +236,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
           } else {
             if (req_.timeout != undefined && req_.timeout > 0) {
               if (timeoutHandler) {
-                clearTimeout(timeoutHandler)
+                clearInterval(timeoutHandler)
                 timeoutHandler = null
                 timeoutDeadlineMilli = null
               }
@@ -254,7 +251,7 @@ function connect(shared: SharedArrayBuffer, toNet: SharedArrayBuffer) {
                   Atomics.store(toNetNotifyView, 0, -1)
                 }
                 Atomics.notify(toNetNotifyView, 0)
-                clearTimeout(timeoutHandler!)
+                clearInterval(timeoutHandler!)
                 timeoutHandler = null
               }, 0.01)
             } else {
@@ -400,14 +397,11 @@ let certResolve: ((cert: Uint8Array) => void) | null = null
 
 export async function startNetworkStack(wasmImageUrl: string): Promise<Uint8Array> {
   const address = "http://localhost:9999/"
-  console.log("[net-stack] Starting network stack...")
-
   const mockServer = ws.link(address)
   const handlers = [
     mockServer.addEventListener("connection", ({ client }) => {
-      console.log("[net-stack] WebSocket connection received")
       if (curSocket != null) {
-        console.log("[net-stack] duplicated connection")
+        console.warn("[net-stack] Duplicate connection ignored")
         return
       }
       curSocket = client
@@ -424,9 +418,7 @@ export async function startNetworkStack(wasmImageUrl: string): Promise<Uint8Arra
   ]
 
   const worker = setupWorker(...handlers)
-  console.log("[net-stack] Starting MSW service worker...")
   await worker.start({ quiet: true })
-  console.log("[net-stack] MSW started, spawning stack worker...")
 
   // Firefox + COEP breaks URL-based and module blob workers.
   // Classic blob worker with dynamic import() works around this.
@@ -479,7 +471,6 @@ export async function startNetworkStack(wasmImageUrl: string): Promise<Uint8Arra
   await new Promise<void>((resolve) => {
     stackWorker.onmessage = (msg) => {
       if (msg.data?.type === "ready") {
-        console.log("[net-stack] Worker ready, sending init...")
         stackWorker.onmessage = onMessage
         resolve()
       }

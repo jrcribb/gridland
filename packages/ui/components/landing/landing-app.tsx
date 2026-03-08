@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { useState } from "react"
 import { StatusBar } from "../status-bar/status-bar"
-import { textStyle } from "../text-style"
 import { useBreakpoints } from "../breakpoints/use-breakpoints"
 import { Logo } from "./logo"
 import { InstallBox } from "./install-box"
