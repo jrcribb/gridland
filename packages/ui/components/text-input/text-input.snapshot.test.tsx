@@ -9,7 +9,7 @@ describe("TextInput snapshots", () => {
   it("renders with placeholder", () => {
     const { screen } = renderTui(
       <TextInput placeholder="Type something..." />,
-      { cols: 40, rows: 4 },
+      { cols: 80, rows: 4 },
     )
     expect(screen.text()).toMatchSnapshot()
   })
@@ -17,7 +17,7 @@ describe("TextInput snapshots", () => {
   it("renders with custom prompt", () => {
     const { screen } = renderTui(
       <TextInput placeholder="Enter name" prompt="$ " promptColor="green" />,
-      { cols: 40, rows: 4 },
+      { cols: 80, rows: 4 },
     )
     expect(screen.text()).toMatchSnapshot()
   })
