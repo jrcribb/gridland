@@ -11,8 +11,11 @@ import { fileURLToPath } from "url"
 const pkgRoot = path.dirname(fileURLToPath(import.meta.url))
 const coreRoot = path.resolve(pkgRoot, "../../opentui/packages/core")
 
-// Bare specifier shims: bun, node built-ins, events
+// Bare specifier shims: bun, node built-ins, events, @opentui packages
 const bareShims = {
+  // Route @opentui/core to our browser-compatible core-shims barrel
+  // (the npm-published @opentui/core is built for Bun/terminal, not browsers)
+  "@opentui/core": path.resolve(pkgRoot, "src/core-shims/index.ts"),
   "bun:ffi": path.resolve(pkgRoot, "src/shims/bun-ffi.ts"),
   "bun-ffi-structs": path.resolve(pkgRoot, "src/shims/bun-ffi-structs.ts"),
   bun: path.resolve(pkgRoot, "src/shims/bun-ffi.ts"),
