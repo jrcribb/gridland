@@ -1,6 +1,7 @@
 import { BrowserBuffer } from "./browser-buffer"
 import { BrowserRenderContext } from "./browser-render-context"
 import { bufferToText } from "./buffer-to-text"
+import { executeRenderPipeline } from "./render-pipeline"
 
 let RootRenderableClass: any = null
 
@@ -36,48 +37,7 @@ export class HeadlessRenderer {
   }
 
   renderOnce(): void {
-    // Clear buffer
-    this.buffer.clear()
-
-    // Run lifecycle passes
-    const lifecyclePasses = this.renderContext.getLifecyclePasses()
-    for (const renderable of lifecyclePasses) {
-      if (renderable.onLifecyclePass) {
-        renderable.onLifecyclePass()
-      }
-    }
-
-    // Calculate layout
-    this.root.calculateLayout()
-
-    // Collect render commands
-    const renderList: any[] = []
-    this.root.updateLayout(0, renderList)
-
-    // Execute render commands
-    for (const cmd of renderList) {
-      switch (cmd.action) {
-        case "pushScissorRect":
-          this.buffer.pushScissorRect(cmd.x, cmd.y, cmd.width, cmd.height)
-          break
-        case "popScissorRect":
-          this.buffer.popScissorRect()
-          break
-        case "pushOpacity":
-          this.buffer.pushOpacity(cmd.opacity)
-          break
-        case "popOpacity":
-          this.buffer.popOpacity()
-          break
-        case "render":
-          cmd.renderable.render(this.buffer, 0)
-          break
-      }
-    }
-
-    // Clear scissor/opacity stacks
-    this.buffer.clearScissorRects()
-    this.buffer.clearOpacity()
+    executeRenderPipeline(this.buffer, this.renderContext, this.root, 0)
   }
 
   toText(): string {
