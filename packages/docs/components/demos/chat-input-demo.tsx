@@ -40,7 +40,6 @@ function ChatInputApp() {
         files={files}
         placeholder="Message Claude..."
         showDividers
-        width={60}
         useKeyboard={useKeyboard}
         onSubmit={(text) => setLastMessage(text)}
       />
