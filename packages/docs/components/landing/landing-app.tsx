@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState } from "react"
-import { StatusBar, useTheme, useBreakpoints } from "@gridland/ui"
+import { StatusBar, useTheme, useBreakpoints, textStyle } from "@gridland/ui"
 import { Logo } from "./logo"
 import { InstallBox } from "./install-box"
 import { LinksBox } from "./links-box"
@@ -36,7 +36,7 @@ export function LandingApp({ useKeyboard }: LandingAppProps) {
     )
   }
 
-  // Approximate the bordered box position:
+  // Approximate the bordered box position for matrix background clear rect:
   // paddingTop(3) + logo(~7 for full, ~13 for narrow, ~2 for tiny) + gap + install/links(3) + gap
   const isBrowser = typeof document !== "undefined"
   const logoHeight = isTiny ? 2 : isNarrow ? 13 : 7
@@ -68,7 +68,21 @@ export function LandingApp({ useKeyboard }: LandingAppProps) {
           <box flexShrink={0} shouldFill={false}>
             <Logo compact={isTiny} narrow={isNarrow} mobile={isMobile} />
           </box>
-          <box flexDirection={isNarrow ? "column" : "row"} gap={isMobile ? 0 : 1} flexShrink={0} shouldFill={false}>
+          <box flexDirection="row" flexWrap="wrap" justifyContent="center" gap={isMobile ? 0 : 1} flexShrink={0} shouldFill={false}>
+            <box
+              border
+              borderStyle="rounded"
+              borderColor={theme.border}
+              paddingX={1}
+              flexDirection="column"
+              flexShrink={0}
+            >
+              <text>
+                <span style={textStyle({ dim: true })}>$ </span>
+                <span style={textStyle({ bold: true })}>npx </span>
+                <span style={textStyle({ fg: theme.accent })}>@gridland/demo landing</span>
+              </text>
+            </box>
             <InstallBox />
             <LinksBox />
           </box>

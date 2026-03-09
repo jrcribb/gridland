@@ -13,6 +13,7 @@ export function LinksBox() {
       borderColor={theme.border}
       paddingX={1}
       flexDirection="column"
+      flexShrink={0}
     >
       <text>
         <span>🐱</span>

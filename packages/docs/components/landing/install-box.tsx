@@ -11,11 +11,12 @@ export function InstallBox() {
       borderColor={theme.border}
       paddingX={1}
       flexDirection="column"
+      flexShrink={0}
     >
       <text>
         <span style={textStyle({ dim: true })}>$ </span>
-        <span style={textStyle({ bold: true })}>npm install </span>
-        <span style={textStyle({ fg: theme.accent })}>@gridland/web</span>
+        <span style={textStyle({ bold: true })}>npm create </span>
+        <span style={textStyle({ fg: theme.accent })}>gridland</span>
       </text>
     </box>
   )
