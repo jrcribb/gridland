@@ -74,6 +74,17 @@ import { useKeyboard } from "@opentui/react"
 />
 ```
 
+```tsx title="Controlled"
+const [value, setValue] = useState("")
+
+<ChatInput
+  value={value}
+  onChange={setValue}
+  useKeyboard={useKeyboard}
+  onSubmit={(text) => console.log(text)}
+/>
+```
+
 ```tsx title="Disabled while streaming"
 <ChatInput
   disabled
@@ -102,6 +113,8 @@ import { useKeyboard } from "@opentui/react"
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `value` | `string` | — | Controlled input value |
+| `defaultValue` | `string` | `""` | Default value for uncontrolled mode |
 | `onSubmit` | `(text: string) => void` | — | Called when user submits a message |
 | `onChange` | `(text: string) => void` | — | Called when input value changes |
 | `placeholder` | `string` | `"Type a message..."` | Placeholder text when empty |

@@ -8,6 +8,10 @@ export interface Suggestion {
 }
 
 export interface ChatInputProps {
+  /** Controlled input value */
+  value?: string
+  /** Default value for uncontrolled mode */
+  defaultValue?: string
   /** Callback when user submits a message */
   onSubmit?: (text: string) => void
   /** Callback when input value changes */
@@ -41,6 +45,8 @@ export interface ChatInputProps {
 const CURSOR_CHAR = "▍"
 
 export function ChatInput({
+  value: controlledValue,
+  defaultValue = "",
   onSubmit,
   onChange,
   placeholder = "Type a message...",
@@ -59,14 +65,23 @@ export function ChatInput({
   const theme = useTheme()
   const resolvedPromptColor = promptColor ?? theme.muted
 
-  const [value, setValue] = useState("")
+  const isControlled = controlledValue !== undefined
+  const controlledRef = useRef(isControlled)
+  if (controlledRef.current !== isControlled) {
+    console.warn("ChatInput: switching between controlled and uncontrolled is not supported.")
+  }
+
+  const [internalValue, setInternalValue] = useState(defaultValue)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [sugIdx, setSugIdx] = useState(0)
   const [history, setHistory] = useState<string[]>([])
   const [histIdx, setHistIdx] = useState(-1)
 
+  const value = isControlled ? controlledValue : internalValue
+
   // Refs to avoid stale closures when React batches multiple dispatches
-  const valueRef = useRef("")
+  const valueRef = useRef(defaultValue)
+  if (isControlled) valueRef.current = controlledValue
   const suggestionsRef = useRef<Suggestion[]>([])
   const sugIdxRef = useRef(0)
   const historyRef = useRef<string[]>([])
@@ -111,7 +126,7 @@ export function ChatInput({
 
   const updateValue = (next: string) => {
     valueRef.current = next
-    setValue(next)
+    if (!isControlled) setInternalValue(next)
     onChange?.(next)
     const sug = computeSuggestions(next)
     setSug(sug)
