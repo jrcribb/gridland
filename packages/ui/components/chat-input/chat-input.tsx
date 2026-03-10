@@ -206,7 +206,7 @@ export function ChatInput({
   return (
     <box flexDirection="column">
       {showDividers && (
-        <text><span style={textStyle({ dim: true, fg: theme.muted })}>{"─".repeat(500)}</span></text>
+        <text wrapMode="none"><span style={textStyle({ dim: true, fg: theme.muted })}>{"─".repeat(500)}</span></text>
       )}
 
       {visibleSuggestions.length > 0 && (
@@ -246,7 +246,7 @@ export function ChatInput({
       </text>
 
       {showDividers && (
-        <text><span style={textStyle({ dim: true, fg: theme.muted })}>{"─".repeat(500)}</span></text>
+        <text wrapMode="none"><span style={textStyle({ dim: true, fg: theme.muted })}>{"─".repeat(500)}</span></text>
       )}
     </box>
   )
