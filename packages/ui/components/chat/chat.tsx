@@ -86,7 +86,7 @@ function MessageBubble({
   return (
     <text wrapMode="word">
       <span style={textStyle({ bold: true, fg: color })}>{prefix}</span>
-      <span>{message.content}</span>
+      <span style={{ fg: theme.foreground }}>{message.content}</span>
     </text>
   )
 }
