@@ -37,8 +37,38 @@ export type { StatusBarProps, StatusBarItem } from "./status-bar/status-bar"
 export { Modal } from "./modal/modal"
 export type { ModalProps } from "./modal/modal"
 
+export { PromptInput, usePromptInput, PromptInputProvider, usePromptInputController } from "./prompt-input/prompt-input"
+export type {
+  PromptInputProps,
+  PromptInputContextValue,
+  PromptInputProviderProps,
+  PromptInputMessage,
+  TextInputContext,
+  SuggestionsContext,
+  ChatStatus,
+  Suggestion,
+} from "./prompt-input/prompt-input"
+
 export { ChatPanel } from "./chat/chat"
 export type { ChatPanelProps, ChatMessage, ToolCallInfo } from "./chat/chat"
+
+export { Timeline } from "./timeline/timeline"
+export type { TimelineProps, Step } from "./timeline/timeline"
+
+export { Message, useMessage } from "./message/message"
+export type {
+  MessageProps,
+  MessageContextValue,
+  MessagePart,
+  TextPart,
+  ReasoningPart,
+  ToolInvocationPart,
+  SourcePart,
+  MessageRole,
+} from "./message/message"
+
+export { AIChat } from "./ai-chat/ai-chat"
+export type { AIChatProps, AIChatModel, AIChatStep, AIChatMessage } from "./ai-chat/ai-chat"
 
 export { TerminalWindow } from "./terminal-window/terminal-window"
 export type { TerminalWindowProps } from "./terminal-window/terminal-window"
@@ -53,6 +83,9 @@ export { textStyle } from "./text-style"
 
 export { ThemeProvider, useTheme, darkTheme, lightTheme } from "./theme"
 export type { Theme, ThemeProviderProps } from "./theme"
+
+export { GridlandProvider, useKeyboardContext } from "./provider/provider"
+export type { GridlandProviderProps } from "./provider/provider"
 
 export { useBreakpoints, BREAKPOINTS } from "./breakpoints/use-breakpoints"
 export type { Breakpoints } from "./breakpoints/use-breakpoints"

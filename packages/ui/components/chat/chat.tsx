@@ -1,7 +1,8 @@
-import { useState, useRef } from "react"
 import { textStyle } from "../text-style"
 import { useTheme } from "../theme/index"
 import type { Theme } from "../theme/index"
+import { PromptInput } from "../prompt-input/prompt-input"
+import type { ChatStatus } from "../prompt-input/prompt-input"
 
 export interface ChatMessage {
   /** Unique identifier for the message. Used as a list key. */
@@ -30,13 +31,24 @@ export interface ChatPanelProps {
   messages: ChatMessage[]
   /** Partial text being streamed from the assistant. */
   streamingText?: string
-  /** Whether the assistant is processing. */
+  /**
+   * AI chat status — drives loading/streaming/error states.
+   * When provided, takes precedence over `isLoading`.
+   * - `ready`: input enabled
+   * - `submitted`: shows loading indicator, input disabled
+   * - `streaming`: shows streaming text, input disabled, Esc calls onStop
+   * - `error`: input enabled, shows error state
+   */
+  status?: ChatStatus
+  /** Whether the assistant is processing. Ignored when `status` is provided. */
   isLoading?: boolean
   /** Currently active tool calls to display as status cards. */
   activeToolCalls?: ToolCallInfo[]
   /** Callback fired when the user submits a message. */
   onSendMessage: (text: string) => void
-  /** Callback for cancellation. Wired to Escape key when loading/streaming. */
+  /** Callback to stop generation. Wired to Escape key during streaming. */
+  onStop?: () => void
+  /** Callback for cancellation. Wired to Escape key when loading/streaming. @deprecated Use `onStop` instead. */
   onCancel?: () => void
   /** Placeholder text shown in the input when empty. */
   placeholder?: string
@@ -131,90 +143,14 @@ function ToolCallCard({ toolCall, statusColors }: { toolCall: ToolCallInfo; stat
   )
 }
 
-function ChatInput({
-  onSubmit,
-  placeholder = "Type a message...",
-  prompt = "> ",
-  promptColor,
-  foregroundColor,
-  disabled = false,
-  useKeyboard,
-}: {
-  onSubmit: (text: string) => void
-  placeholder?: string
-  prompt?: string
-  promptColor: string
-  foregroundColor: string
-  disabled?: boolean
-  useKeyboard?: (handler: (event: any) => void) => void
-}) {
-  const [value, setValue] = useState("")
-  const valueRef = useRef("")
-
-  const updateValue = (newValue: string) => {
-    valueRef.current = newValue
-    setValue(newValue)
-  }
-
-  useKeyboard?.((event: any) => {
-    if (disabled) return
-
-    if (event.name === "return") {
-      const trimmed = valueRef.current.trim()
-      if (trimmed) {
-        onSubmit(trimmed)
-        updateValue("")
-      }
-      return
-    }
-
-    if (event.name === "backspace" || event.name === "delete") {
-      updateValue(valueRef.current.slice(0, -1))
-      return
-    }
-
-    // Ignore ctrl/meta modified keys
-    if (event.ctrl || event.meta) return
-
-    // Only append printable characters (single char)
-    if (event.name && event.name.length === 1) {
-      updateValue(valueRef.current + event.name)
-      return
-    }
-
-    // Handle space key
-    if (event.name === "space") {
-      updateValue(valueRef.current + " ")
-      return
-    }
-  })
-
-  const showPlaceholder = value.length === 0
-
-  return (
-    <text>
-      <span style={textStyle({ fg: promptColor })}>{prompt}</span>
-      {showPlaceholder ? (
-        <>
-          <span style={textStyle({ dim: true, fg: foregroundColor })}>{placeholder}</span>
-          {!disabled && <span style={textStyle({ inverse: true })}>{" "}</span>}
-        </>
-      ) : (
-        <>
-          <span style={{ fg: foregroundColor }}>{value}</span>
-          {!disabled && <span style={textStyle({ inverse: true })}>{" "}</span>}
-        </>
-      )}
-    </text>
-  )
-}
-
 export function ChatPanel({
   messages,
   streamingText = "",
+  status,
   isLoading = false,
   activeToolCalls = [],
   onSendMessage,
+  onStop,
   onCancel,
   placeholder = "Type a message...",
   promptChar = "> ",
@@ -222,29 +158,24 @@ export function ChatPanel({
   userColor,
   assistantColor,
   loadingText = "Thinking...",
-  useKeyboard,
+  useKeyboard: useKeyboardProp,
 }: ChatPanelProps) {
   const theme = useTheme()
   const resolvedUserColor = userColor ?? theme.secondary
   const resolvedAssistantColor = assistantColor ?? theme.primary
   const resolvedPromptColor = promptColor ?? theme.secondary
   const statusColors = getStatusColors(theme)
-  const inputDisabled = isLoading || !!streamingText
 
-  // We need to split keyboard handling: escape goes to cancel, rest to ChatInput
-  // To do this, we wrap useKeyboard to intercept escape
-  const wrappedUseKeyboard = useKeyboard
-    ? (handler: (event: any) => void) => {
-        useKeyboard((event: any) => {
-          // Escape triggers onCancel when loading/streaming
-          if (event.name === "escape" && inputDisabled && onCancel) {
-            onCancel()
-            return
-          }
-          handler(event)
-        })
-      }
+  // Derive chat status from props
+  const chatStatus: ChatStatus | undefined = status
+    ? status
+    : isLoading && !streamingText ? "submitted"
+    : streamingText ? "streaming"
     : undefined
+
+  const isSubmitted = chatStatus === "submitted"
+  const isStreaming = chatStatus === "streaming"
+  const stopHandler = onStop ?? onCancel
 
   return (
     <box flexDirection="column" paddingX={1}>
@@ -265,26 +196,28 @@ export function ChatPanel({
       ))}
 
       {/* Streaming text OR loading indicator */}
-      {streamingText ? (
+      {isStreaming && streamingText ? (
         <StreamingTextDisplay
           text={streamingText}
           assistantColor={resolvedAssistantColor}
           foregroundColor={theme.foreground}
         />
-      ) : isLoading ? (
+      ) : isSubmitted ? (
         <text style={textStyle({ dim: true, fg: theme.muted })}>{"  "}{loadingText}</text>
       ) : null}
 
-      {/* Chat input with margin-top 1 */}
+      {/* Input */}
       <box marginTop={1}>
-        <ChatInput
-          onSubmit={onSendMessage}
+        <PromptInput
+          onSubmit={(msg) => onSendMessage(msg.text)}
+          onStop={stopHandler}
+          status={chatStatus}
           placeholder={placeholder}
           prompt={promptChar}
           promptColor={resolvedPromptColor}
           foregroundColor={theme.foreground}
-          disabled={inputDisabled}
-          useKeyboard={wrappedUseKeyboard}
+          submittedText={loadingText}
+          useKeyboard={useKeyboardProp}
         />
       </box>
     </box>
