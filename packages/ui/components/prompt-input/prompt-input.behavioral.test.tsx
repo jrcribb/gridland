@@ -496,7 +496,7 @@ describe("PromptInput compound mode", () => {
 
   it("renders submit icon for streaming status", () => {
     const { screen } = renderTui(
-      <PromptInput status="streaming">
+      <PromptInput status="streaming" onStop={() => {}}>
         <PromptInput.Submit />
       </PromptInput>,
       { cols: 40, rows: 4 },
