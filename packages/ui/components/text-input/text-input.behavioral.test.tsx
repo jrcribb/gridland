@@ -12,14 +12,17 @@ describe("TextInput", () => {
   })
 
   it("accepts all documented props", () => {
-    // Type-level test: verify the component accepts these props
     const props = {
+      label: "Username",
+      description: "Enter your display name",
+      error: "This field is required",
+      required: true,
+      disabled: false,
       value: "test",
       onChange: (_v: string) => {},
       onSubmit: (_v: string) => {},
       placeholder: "Type here...",
-      prompt: "$ ",
-      promptColor: "cyan",
+      prompt: "> ",
       focus: true,
       maxLength: 100,
     }
