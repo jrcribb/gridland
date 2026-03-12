@@ -432,6 +432,7 @@ export function PromptInput({
   histIdxRef.current = histIdx
 
   const setSug = useCallback((next: Suggestion[]) => {
+    suggestionsRef.current = next
     if (usingProvider) {
       controller.suggestions.setSuggestions(next)
     } else {
@@ -440,6 +441,7 @@ export function PromptInput({
   }, [usingProvider, controller])
 
   const setSugI = useCallback((next: number) => {
+    sugIdxRef.current = next
     if (usingProvider) {
       controller.suggestions.setSelectedIndex(next)
     } else {
@@ -448,10 +450,12 @@ export function PromptInput({
   }, [usingProvider, controller])
 
   const setHist = useCallback((next: string[]) => {
+    historyRef.current = next
     setHistory(next)
   }, [])
 
   const setHistI = useCallback((next: number) => {
+    histIdxRef.current = next
     setHistIdx(next)
   }, [])
 
