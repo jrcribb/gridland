@@ -3,7 +3,6 @@ title: Message
 description: Parts-based chat message with support for text, reasoning, tool calls, and sources
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import MessageDemo, { MessageWithInputDemo } from '@/components/demos/message-demo'
 
@@ -28,28 +27,9 @@ Combine `Message` with `PromptInput` for a complete conversation view. Type a me
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json message
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
@@ -59,7 +39,7 @@ Compose sub-components inside `Message`. All sub-components read shared state
 (role, streaming, background color) from context via `useMessage()`.
 
 ```tsx title="Simple text messages"
-import { Message } from "@gridland/ui"
+import { Message } from "@/components/ui/message"
 
 <Message role="user">
   <Message.Content>
@@ -89,7 +69,7 @@ The consumer maps over `message.parts` and picks which sub-components to render.
 This follows the ai-element pattern for full control over layout.
 
 ```tsx title="With useChat"
-import { Message } from "@gridland/ui"
+import { Message } from "@/components/ui/message"
 
 const { messages, status } = useChat({ api: "/api/chat" })
 
@@ -150,7 +130,7 @@ For advanced consumers, `useMessage()` exposes the context value
 from within any sub-component:
 
 ```tsx title="Custom sub-component"
-import { useMessage } from "@gridland/ui"
+import { useMessage } from "@/components/ui/message"
 
 function MyCustomStatus() {
   const { role, isStreaming } = useMessage()

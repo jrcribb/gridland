@@ -3,7 +3,6 @@ title: Tabs
 description: Compound tab component with triggers and content panels
 ---
 
-import { Tabs as FumiTabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import TabsDemo, { TabsSimpleDemo } from '@/components/demos/tabs-demo'
 
@@ -24,33 +23,14 @@ side by side. The active panel renders automatically.
 
 ## Installation
 
-<FumiTabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json tab-bar
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</FumiTabs>
 
 ## Usage
 
 ```tsx title="Compound API"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@gridland/ui"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tab-bar"
 
 <Tabs defaultValue="files">
   <TabsList>
@@ -71,7 +51,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@gridland/ui"
 ```
 
 ```tsx title="Simple API"
-import { TabBar } from "@gridland/ui"
+import { TabBar } from "@/components/ui/tab-bar"
 
 <TabBar label="View" options={["Files", "Search", "Git"]} selectedIndex={0} />
 ```

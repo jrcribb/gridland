@@ -3,7 +3,6 @@ title: Modal
 description: Bordered overlay container with optional title and Escape key handling
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import ModalDemo from '@/components/demos/modal-demo'
 
@@ -18,33 +17,14 @@ content, optionally displays a title, and listens for the Escape key to trigger 
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json modal
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
 ```tsx title="Example"
-import { Modal } from "@gridland/ui"
+import { Modal } from "@/components/ui/modal"
 
 <Modal title="Settings" borderColor="blue" onClose={() => setOpen(false)}>
   <text>Modal content here</text>

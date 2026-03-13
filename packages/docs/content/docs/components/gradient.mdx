@@ -3,7 +3,6 @@ title: Gradient
 description: Apply color gradients to text
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import GradientDemo from '@/components/demos/gradient-demo'
 
@@ -17,33 +16,14 @@ The `Gradient` component from `@gridland/ui` applies color gradients across text
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json gradient
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
 ```tsx title="Import"
-import { Gradient } from "@gridland/ui"
+import { Gradient } from "@/components/ui/gradient"
 ```
 
 ### Named Gradient

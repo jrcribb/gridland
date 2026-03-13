@@ -14,7 +14,7 @@ Terminal elements accept `fg`, `bg`, and a numeric `attributes` bitmask in their
 ## Usage
 
 ```tsx
-import { textStyle } from "@gridland/ui"
+import { textStyle } from "@/components/ui/text-style"
 
 <text style={textStyle({ fg: "#FF71CE", bold: true })}>Bold pink</text>
 ```
@@ -22,7 +22,8 @@ import { textStyle } from "@gridland/ui"
 Combine with `useTheme()` for themed styles:
 
 ```tsx
-import { useTheme, textStyle } from "@gridland/ui"
+import { useTheme } from "@/components/ui/theme"
+import { textStyle } from "@/components/ui/text-style"
 
 function MyComponent() {
   const theme = useTheme()

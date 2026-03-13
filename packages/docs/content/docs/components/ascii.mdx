@@ -3,7 +3,6 @@ title: Ascii
 description: ASCII art text rendering with font styles
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import AsciiDemo from '@/components/demos/ascii-demo'
 
@@ -18,33 +17,14 @@ various font styles.
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json ascii
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
 ```tsx title="Example"
-import { Ascii } from "@gridland/ui"
+import { Ascii } from "@/components/ui/ascii"
 
 <Ascii text="Hello" font="slick" color="#88c0d0" />
 ```

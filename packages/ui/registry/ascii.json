@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ascii",
+  "type": "registry:ui",
+  "title": "Ascii",
+  "description": "ASCII art text renderer using figlet fonts",
+  "registryDependencies": [
+    "theme"
+  ],
+  "files": [
+    {
+      "path": "registry/ui/ascii.tsx",
+      "type": "registry:ui",
+      "content": "import { useTheme } from \"./theme\"\n\nexport interface AsciiProps {\n  text: string\n  font?: \"tiny\" | \"block\" | \"slick\" | \"shade\"\n  color?: string\n}\n\nexport function Ascii({ text, font, color }: AsciiProps) {\n  const theme = useTheme()\n  const resolvedColor = color ?? theme.primary\n  return <ascii-font text={text} font={font} style={{ fg: resolvedColor }} />\n}\n"
+    }
+  ]
+}

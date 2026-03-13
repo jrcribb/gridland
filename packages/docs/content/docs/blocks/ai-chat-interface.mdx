@@ -73,8 +73,9 @@ export async function POST(req: Request) {
 Wire up `useChat` from the Vercel AI SDK with `Message` compound components and `PromptInput`.
 
 ```tsx title="chat-interface.tsx"
-import { Message, PromptInput } from "@gridland/ui"
-import type { ChatStatus } from "@gridland/ui"
+import { Message } from "@/components/ui/message"
+import { PromptInput } from "@/components/ui/prompt-input"
+import type { ChatStatus } from "@/components/ui/prompt-input"
 import { useChat } from "@ai-sdk/react"
 import { useKeyboard } from "@opentui/react"
 
