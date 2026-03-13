@@ -62,10 +62,10 @@ import { Timeline } from "@gridland/ui"
 ```tsx title="Expanded with active step"
 <Timeline
   steps={[
-    { tool: "Read", label: "Reading codebase — src/", status: "done" },
-    { tool: "Think", label: "Planning changes — auth module", status: "done" },
-    { tool: "Edit", label: "Editing files — 4 files", status: "running" },
-    { tool: "Bash", label: "Running tests — vitest", status: "pending" },
+    { tool: "Read", label: "Reading codebase -src/", status: "done" },
+    { tool: "Think", label: "Planning changes -auth module", status: "done" },
+    { tool: "Edit", label: "Editing files -4 files", status: "running" },
+    { tool: "Bash", label: "Running tests -vitest", status: "pending" },
   ]}
   duration="4.3s"
   collapsed={false}
@@ -80,7 +80,7 @@ import { Timeline } from "@gridland/ui"
 <Timeline
   steps={[
     { tool: "Read", label: "Reading config", status: "done" },
-    { tool: "Bash", label: "Running tests — vitest", status: "error", output: "FAIL src/auth.test.ts — expected 200, got 401" },
+    { tool: "Bash", label: "Running tests -vitest", status: "error", output: "FAIL src/auth.test.ts -expected 200, got 401" },
     { tool: "Edit", label: "Fixing auth handler", status: "running" },
   ]}
   duration="2.1s"
@@ -113,7 +113,7 @@ import { Timeline } from "@gridland/ui"
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `steps` | `Step[]` | — | Array of step entries to display |
+| `steps` | `Step[]` | -| Array of step entries to display |
 | `duration` | `string` | `"0ms"` | Duration string shown in the header |
 | `collapsed` | `boolean` | `true` | Whether the step list is hidden |
 | `headerLabel` | `string` | `"Thought for"` | Label prefix shown before the duration |
@@ -122,8 +122,8 @@ import { Timeline } from "@gridland/ui"
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `tool` | `string` | — | Tool or operation name (e.g. "Read", "Edit") |
-| `label` | `string` | — | Description of the step |
-| `status` | `"done" \| "running" \| "pending" \| "error"` | — | Current step status |
-| `duration` | `string` | — | Optional duration for the individual step |
-| `output` | `string` | — | Output or detail text shown below the step |
+| `tool` | `string` | -| Tool or operation name (e.g. "Read", "Edit") |
+| `label` | `string` | -| Description of the step |
+| `status` | `"done" \| "running" \| "pending" \| "error"` | -| Current step status |
+| `duration` | `string` | -| Optional duration for the individual step |
+| `output` | `string` | -| Output or detail text shown below the step |

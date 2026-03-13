@@ -85,7 +85,7 @@ const [value, setValue] = useState("")
 />
 ```
 
-```tsx title="With AI SDK — direct sendMessage pass-through"
+```tsx title="With AI SDK - direct sendMessage pass-through"
 const { status, sendMessage, stop } = useChat({ /* transport config */ })
 
 <PromptInput
@@ -123,7 +123,7 @@ const { status, sendMessage, stop } = useChat({ /* transport config */ })
 ## Compound Components
 
 For full control over layout, pass children to use compound mode. The subcomponents
-read state from `PromptInput` via context — no prop drilling needed.
+read state from `PromptInput` via context, no prop drilling needed.
 
 ```tsx title="Compound usage"
 import { PromptInput } from "@gridland/ui"
@@ -170,15 +170,15 @@ function MyCustomStatus() {
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | `string` | — | Controlled input value |
+| `value` | `string` | - | Controlled input value |
 | `defaultValue` | `string` | `""` | Default value for uncontrolled mode |
-| `onSubmit` | `(message: { text: string }) => void \| Promise<void>` | — | Called when user submits. Matches Vercel AI SDK `sendMessage({ text })`. |
-| `onChange` | `(text: string) => void` | — | Called when input value changes |
+| `onSubmit` | `(message: { text: string }) => void \| Promise<void>` | - | Called when user submits. Matches Vercel AI SDK `sendMessage({ text })`. |
+| `onChange` | `(text: string) => void` | - | Called when input value changes |
 | `placeholder` | `string` | `"Type a message..."` | Placeholder text when empty |
 | `prompt` | `string` | `"❯ "` | Prompt character before input |
 | `promptColor` | `string` | `theme.muted` | Color of the prompt character |
-| `status` | `ChatStatus` | — | AI chat status: `"ready"` \| `"submitted"` \| `"streaming"` \| `"error"`. Drives disabled state and hint text. |
-| `onStop` | `() => void` | — | Called when Escape is pressed during `"streaming"` status |
+| `status` | `ChatStatus` | - | AI chat status: `"ready"` \| `"submitted"` \| `"streaming"` \| `"error"`. Drives disabled state and hint text. |
+| `onStop` | `() => void` | - | Called when Escape is pressed during `"streaming"` status |
 | `submittedText` | `string` | `"Thinking..."` | Text shown when status is `"submitted"` |
 | `streamingText` | `string` | `"Generating..."` | Text shown when status is `"streaming"` |
 | `errorText` | `string` | `"An error occurred. Try again."` | Text shown when status is `"error"` |
@@ -186,12 +186,12 @@ function MyCustomStatus() {
 | `disabledText` | `string` | `"Generating..."` | Text shown when disabled. Ignored when `status` is provided. |
 | `commands` | `{ cmd: string; desc?: string }[]` | `[]` | Slash commands for autocomplete |
 | `files` | `string[]` | `[]` | File paths for @ mention autocomplete |
-| `getSuggestions` | `(value: string) => Suggestion[]` | — | Custom suggestion provider |
+| `getSuggestions` | `(value: string) => Suggestion[]` | - | Custom suggestion provider |
 | `maxSuggestions` | `number` | `5` | Max visible suggestions |
 | `enableHistory` | `boolean` | `true` | Enable command history |
 | `showDividers` | `boolean` | `false` | Show full-width horizontal dividers above and below input |
-| `useKeyboard` | `function` | — | Keyboard hook from `@opentui/react` |
-| `children` | `ReactNode` | — | When provided, enables compound mode — user composes subcomponents |
+| `useKeyboard` | `function` | - | Keyboard hook from `@opentui/react` |
+| `children` | `ReactNode` | - | When provided, enables compound mode. User composes subcomponents. |
 
 ### Suggestion
 

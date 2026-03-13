@@ -8,7 +8,7 @@ import { RunDemo } from '@/components/ui/run-demo'
 import TabsDemo, { TabsSimpleDemo } from '@/components/demos/tabs-demo'
 
 A compound tab component inspired by shadcn/ui. Declare triggers and content panels
-side by side — the active panel renders automatically.
+side by side. The active panel renders automatically.
 
 <div className="my-8">
   <TabsSimpleDemo />
@@ -84,9 +84,9 @@ Root component that manages the active tab state.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | `string` | — | Controlled active tab value |
+| `value` | `string` | - | Controlled active tab value |
 | `defaultValue` | `string` | `""` | Default active tab (uncontrolled) |
-| `onValueChange` | `(value: string) => void` | — | Called when the active tab changes |
+| `onValueChange` | `(value: string) => void` | - | Called when the active tab changes |
 
 ### TabsList
 
@@ -94,14 +94,14 @@ Renders the horizontal tab bar from its `TabsTrigger` children.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | — | Text label shown before the triggers |
+| `label` | `string` | - | Text label shown before the triggers |
 | `focused` | `boolean` | `true` | Whether the tab bar appears focused |
 | `activeColor` | `string` | `theme.accent` | Foreground color of the active trigger |
 | `separator` | `boolean` | `true` | Show horizontal separator below triggers |
 
 ### TabsTrigger
 
-Declares a tab option. Does not render on its own — `TabsList` reads its props.
+Declares a tab option. Does not render on its own. `TabsList` reads its props.
 
 | Prop | Type | Description |
 |------|------|-------------|
@@ -123,9 +123,9 @@ A convenience wrapper for cases where you don't need content panels.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `label` | `string` | — | Text label shown before the options |
-| `options` | `string[]` | — | Array of option strings to display |
-| `selectedIndex` | `number` | — | Zero-based index of the selected option |
+| `label` | `string` | - | Text label shown before the options |
+| `options` | `string[]` | - | Array of option strings to display |
+| `selectedIndex` | `number` | - | Zero-based index of the selected option |
 | `focused` | `boolean` | `true` | Whether the tab bar appears focused |
 | `activeColor` | `string` | `theme.accent` | Foreground color of the selected option |
 | `separator` | `boolean` | `true` | Show horizontal separator below tabs |

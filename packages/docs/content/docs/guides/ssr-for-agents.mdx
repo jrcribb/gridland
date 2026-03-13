@@ -8,7 +8,7 @@ import HeadlessDemo from '@/components/demos/headless-demo'
 
 Gridland components render to a canvas in the browser, which means crawlers and
 AI agents can't read the content by default. Headless rendering solves this by
-rendering your components to plain text — no browser or canvas required.
+rendering your components to plain text, no browser or canvas required.
 
 The same component produces different output depending on who's looking at it.
 Toggle between Browser and SSR to see the difference:
@@ -26,7 +26,7 @@ crawlers get readable content while browsers get the full canvas experience.
 ```tsx title="app/page.tsx"
 import { TUI } from "@gridland/web"
 
-// No extra setup — SSR text rendering is automatic
+// No extra setup - SSR text rendering is automatic
 export default function Page() {
   return (
     <TUI style={{ width: "100vw", height: "100vh" }}>
@@ -156,8 +156,8 @@ generated. Add it to your build script:
 
 ## Use Cases
 
-- **SEO and crawlers** — Search engines see real text content instead of an empty canvas
-- **AI agents** — LLMs and AI tools can read your TUI app's content from raw HTML
-- **Accessibility** — Screen readers can access the text fallback
-- **Testing** — Render components to text for snapshot tests without a browser
-- **CLI tools** — Generate text output from the same React components you use in the browser
+- **SEO and crawlers** - Search engines see real text content instead of an empty canvas
+- **AI agents** - LLMs and AI tools can read your TUI app's content from raw HTML
+- **Accessibility** - Screen readers can access the text fallback
+- **Testing** - Render components to text for snapshot tests without a browser
+- **CLI tools** - Generate text output from the same React components you use in the browser

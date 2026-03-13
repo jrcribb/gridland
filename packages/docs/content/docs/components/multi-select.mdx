@@ -144,13 +144,13 @@ const [selected, setSelected] = useState<string[]>(["ts"])
 |------|------|---------|-------------|
 | `items` | `MultiSelectItem<V>[]` | `[]` | Array of selectable items |
 | `defaultSelected` | `V[]` | `[]` | Initially selected values (uncontrolled) |
-| `selected` | `V[]` | — | Selected values (controlled) |
-| `onChange` | `(values: V[]) => void` | — | Called when selection changes (controlled) |
+| `selected` | `V[]` | - | Selected values (controlled) |
+| `onChange` | `(values: V[]) => void` | - | Called when selection changes (controlled) |
 | `disabled` | `boolean` | `false` | Disable the entire component |
 | `invalid` | `boolean` | `false` | Show error state with destructive styling |
 | `required` | `boolean` | `false` | Show required indicator (`*`) next to title |
-| `placeholder` | `string` | — | Placeholder text when items list is empty |
-| `maxCount` | `number` | — | Maximum number of selectable items |
+| `placeholder` | `string` | - | Placeholder text when items list is empty |
+| `maxCount` | `number` | - | Maximum number of selectable items |
 | `title` | `string` | `"Select"` | Title shown next to the diamond indicator |
 | `submittedStatus` | `string` | `"submitted"` | Status text shown after submit |
 | `limit` | `number` | `12` | Max visible rows (enables scrolling) |
@@ -159,8 +159,8 @@ const [selected, setSelected] = useState<string[]>(["ts"])
 | `highlightColor` | `string` | `theme.primary` | Color of the highlighted item |
 | `checkboxColor` | `string` | `theme.accent` | Color of the selection indicator |
 | `allowEmpty` | `boolean` | `false` | Always show Submit row, allowing empty submission |
-| `onSubmit` | `(values: V[]) => void` | — | Called when Submit row is selected |
-| `useKeyboard` | `function` | — | Keyboard hook from `@opentui/react` |
+| `onSubmit` | `(values: V[]) => void` | - | Called when Submit row is selected |
+| `useKeyboard` | `function` | - | Keyboard hook from `@opentui/react` |
 
 ### MultiSelectItem
 

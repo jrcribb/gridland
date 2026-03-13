@@ -141,13 +141,13 @@ bunx @gridland/container my-app --build
 
 Every container runs with hardened defaults:
 
-- **`--cap-drop=ALL`** — all Linux capabilities dropped
-- **`--security-opt=no-new-privileges`** — prevents privilege escalation
-- **`--read-only`** — root filesystem is read-only
-- **`--pids-limit=256`** — limits process count
-- **`--memory=512m`** — default memory cap
-- **Non-root user** — runs as an unprivileged `runner` user
-- **tmpfs `/tmp`** — writable scratch space limited to 256MB
+- **`--cap-drop=ALL`** -all Linux capabilities dropped
+- **`--security-opt=no-new-privileges`** -prevents privilege escalation
+- **`--read-only`** -root filesystem is read-only
+- **`--pids-limit=256`** -limits process count
+- **`--memory=512m`** -default memory cap
+- **Non-root user** -runs as an unprivileged `runner` user
+- **tmpfs `/tmp`** -writable scratch space limited to 256MB
 
 <Callout type="warn">
 Network access is enabled by default. Use `--no-network` when running
