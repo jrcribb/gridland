@@ -1,0 +1,64 @@
+export interface Theme {
+  /** Main brand color — headings, highlights, active elements */
+  primary: string
+  /** Secondary brand color — interactive highlights, focused states */
+  accent: string
+  /** Tertiary color — user messages, checkboxes, prompts */
+  secondary: string
+  /** Subdued color — disabled states, placeholders, secondary text */
+  muted: string
+  /** Border and divider color */
+  border: string
+  /** Default foreground text color */
+  foreground: string
+  /** App background color */
+  background: string
+  /** Success state color */
+  success: string
+  /** Error state color */
+  error: string
+  /** Warning state color */
+  warning: string
+}
+
+export const darkTheme: Theme = {
+  primary: "#FF71CE",
+  accent: "#01CDFE",
+  secondary: "#B967FF",
+  muted: "#9D93B1",
+  border: "#B967FF",
+  foreground: "#F0E6FF",
+  background: "#0D0B10",
+  success: "#05FFA1",
+  error: "#FF6B6B",
+  warning: "#FFC164",
+}
+
+export const lightTheme: Theme = {
+  primary: "#2563EB",
+  accent: "#7C3AED",
+  secondary: "#0369A1",
+  muted: "#64748B",
+  border: "#E2E8F0",
+  foreground: "#1E293B",
+  background: "#FFFFFF",
+  success: "#15803D",
+  error: "#E11D48",
+  warning: "#B45309",
+}
+
+import { createContext, useContext, type ReactNode } from "react"
+const ThemeContext = createContext<Theme>(darkTheme)
+
+export interface ThemeProviderProps {
+  theme: Theme
+  children: ReactNode
+}
+
+export function ThemeProvider({ theme, children }: ThemeProviderProps) {
+  return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
+}
+
+export function useTheme(): Theme {
+  return useContext(ThemeContext)
+}

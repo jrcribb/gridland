@@ -3,7 +3,6 @@ title: MultiSelect
 description: Multi-selection list with selection indicators and groups
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import MultiSelectDemo from '@/components/demos/multi-select-demo'
 
@@ -18,33 +17,14 @@ with selection indicators, keyboard navigation, group headers, and a submitted s
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json multi-select
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
 ```tsx title="Uncontrolled"
-import { MultiSelect } from "@gridland/ui"
+import { MultiSelect } from "@/components/ui/multi-select"
 import { useKeyboard } from "@opentui/react"
 
 <MultiSelect
@@ -62,7 +42,7 @@ import { useKeyboard } from "@opentui/react"
 
 ```tsx title="Controlled"
 import { useState } from "react"
-import { MultiSelect } from "@gridland/ui"
+import { MultiSelect } from "@/components/ui/multi-select"
 import { useKeyboard } from "@opentui/react"
 
 const [selected, setSelected] = useState<string[]>(["ts"])

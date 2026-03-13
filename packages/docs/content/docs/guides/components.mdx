@@ -1,0 +1,54 @@
+---
+title: Installing Components
+description: How to install individual @gridland/ui components using the shadcn CLI
+---
+
+## Installation
+
+Install individual components using the shadcn CLI. Each component is copied into your project so you own the code and can customize it freely.
+
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json <component-name>
+```
+
+For example, to install the Spinner component:
+
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json spinner
+```
+
+Components that depend on shared utilities (like `theme` or `text-style`) will automatically install those dependencies alongside the component.
+
+### Available components
+
+| Component | Registry name |
+|-----------|--------------|
+| Ascii | `ascii` |
+| Chat | `chat` |
+| Gradient | `gradient` |
+| Link | `link` |
+| Made with Gridland | `made-with-gridland` |
+| Made with OpenTUI | `made-with-opentui` |
+| Message | `message` |
+| Modal | `modal` |
+| Multi Select | `multi-select` |
+| Prompt Input | `prompt-input` |
+| Select Input | `select-input` |
+| Spinner | `spinner` |
+| Status Bar | `status-bar` |
+| Tab Bar | `tab-bar` |
+| Table | `table` |
+| Terminal Window | `terminal-window` |
+| Text Input | `text-input` |
+| Timeline | `timeline` |
+
+### Shared utilities
+
+These are installed automatically when needed by a component:
+
+| Utility | Registry name | Description |
+|---------|--------------|-------------|
+| Theme | `theme` | Theme context, provider, and built-in dark/light themes |
+| Text Style | `text-style` | Helper to convert text decoration flags to opentui style objects |
+| Provider | `provider` | GridlandProvider root component with theme and keyboard context |
+| Breakpoints | `breakpoints` | Responsive breakpoints hook using terminal dimensions |

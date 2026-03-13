@@ -3,12 +3,18 @@ title: "@gridland/ui"
 description: UI component library API reference
 ---
 
+Individual components can be installed via the shadcn CLI. See the [Installing Components](/docs/guides/components) guide for details.
+
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json <component-name>
+```
+
 ## Gradient
 
 Renders color gradients across text or backgrounds.
 
 ```tsx
-import { Gradient } from "@gridland/ui"
+import { Gradient } from "@/components/ui/gradient"
 ```
 
 See [Gradient component docs](/docs/components/gradient) for usage examples.
@@ -44,7 +50,7 @@ Generate an array of interpolated colors.
 Renders structured data in a table layout.
 
 ```tsx
-import { Table } from "@gridland/ui"
+import { Table } from "@/components/ui/table"
 ```
 
 See [Table component docs](/docs/components/table) for usage examples.

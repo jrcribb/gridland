@@ -18,7 +18,9 @@ Gridland UI uses semantic color tokens to theme all components. A `Theme` is a f
 ## Quick Start
 
 ```tsx title="app.tsx"
-import { ThemeProvider, darkTheme, Spinner, Table } from "@gridland/ui"
+import { ThemeProvider, darkTheme } from "@/components/ui/theme"
+import { Spinner } from "@/components/ui/spinner"
+import { Table } from "@/components/ui/table"
 
 function App() {
   return (
@@ -48,7 +50,7 @@ function App() {
 ## Built-in Themes
 
 ```tsx
-import { darkTheme, lightTheme } from "@gridland/ui"
+import { darkTheme, lightTheme } from "@/components/ui/theme"
 ```
 
 ### Dark
@@ -66,7 +68,7 @@ import { darkTheme, lightTheme } from "@gridland/ui"
 ## Custom Themes
 
 ```tsx title="my-theme.ts"
-import type { Theme } from "@gridland/ui"
+import type { Theme } from "@/components/ui/theme"
 
 export const myTheme: Theme = {
   primary: "#61afef",
@@ -85,7 +87,7 @@ export const myTheme: Theme = {
 Or extend a built-in theme:
 
 ```tsx title="custom-theme.ts"
-import { darkTheme } from "@gridland/ui"
+import { darkTheme } from "@/components/ui/theme"
 
 export const customTheme = {
   ...darkTheme,
@@ -98,7 +100,7 @@ export const customTheme = {
 Access tokens in your own components:
 
 ```tsx
-import { useTheme } from "@gridland/ui"
+import { useTheme } from "@/components/ui/theme"
 
 function MyComponent() {
   const theme = useTheme()

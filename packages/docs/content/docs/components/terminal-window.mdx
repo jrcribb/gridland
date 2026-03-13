@@ -3,7 +3,6 @@ title: TerminalWindow
 description: Decorative terminal-style window chrome container
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import TerminalWindowDemo from '@/components/demos/terminal-window-demo'
 
@@ -18,33 +17,14 @@ a terminal window, with traffic light buttons and an optional centered title. By
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json terminal-window
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
 ```tsx title="Example"
-import { TerminalWindow } from "@gridland/ui"
+import { TerminalWindow } from "@/components/ui/terminal-window"
 
 <TerminalWindow title="my-terminal">
   <div>Window content here</div>

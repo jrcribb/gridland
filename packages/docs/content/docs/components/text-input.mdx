@@ -3,7 +3,6 @@ title: TextInput
 description: Interactive text input field with label, prompt, validation, and multiple states
 ---
 
-import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
 import TextInputDemo, { TextInputPickerDemo } from '@/components/demos/text-input-demo'
 
@@ -24,33 +23,14 @@ with label, prompt, placeholder, validation states, and controlled/uncontrolled 
 
 ## Installation
 
-<Tabs items={['bun', 'npm', 'yarn', 'pnpm']}>
-<Tab value="bun">
-```bash title="Terminal"
-bun add @gridland/ui
+```bash
+bunx shadcn@latest add https://raw.githubusercontent.com/cjroth/gridland/main/packages/ui/registry.json text-input
 ```
-</Tab>
-<Tab value="npm">
-```bash title="Terminal"
-npm install @gridland/ui
-```
-</Tab>
-<Tab value="yarn">
-```bash title="Terminal"
-yarn add @gridland/ui
-```
-</Tab>
-<Tab value="pnpm">
-```bash title="Terminal"
-pnpm add @gridland/ui
-```
-</Tab>
-</Tabs>
 
 ## Usage
 
 ```tsx title="Basic"
-import { TextInput } from "@gridland/ui"
+import { TextInput } from "@/components/ui/text-input"
 
 <TextInput
   label="Username"
