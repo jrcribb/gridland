@@ -10,8 +10,8 @@ const NAMES_PATH = join(DEMO_DIR, "dist/demo-names.json")
 
 const AVAILABLE_DEMOS = [
   "gradient", "ascii", "table", "spinner", "select-input",
-  "multi-select", "prompt-input", "text-input", "link", "tab-bar", "status-bar",
-  "modal", "primitives", "chat", "timeline", "message", "ai-chat", "terminal", "landing",
+  "multi-select", "prompt-input", "text-input", "link", "tabs", "status-bar",
+  "modal", "primitives", "chat", "timeline", "message", "ai-chat", "terminal-window", "landing",
 ]
 
 function run(...args: string[]) {

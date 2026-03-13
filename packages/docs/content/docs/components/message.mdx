@@ -5,7 +5,7 @@ description: Parts-based chat message with support for text, reasoning, tool cal
 
 import { Tabs, Tab } from 'fumadocs-ui/components/tabs'
 import { RunDemo } from '@/components/ui/run-demo'
-import ChatBubbleDemo, { ChatBubbleWithInputDemo } from '@/components/demos/chat-bubble-demo'
+import MessageDemo, { MessageWithInputDemo } from '@/components/demos/message-demo'
 
 The `Message` component from `@gridland/ui` renders a single chat message using
 a compound component pattern aligned with the Vercel AI SDK's `UIMessage` format
@@ -13,7 +13,7 @@ and ai-element's architecture. Consumers map over message parts and compose
 sub-components for full control over layout.
 
 <div className="my-8">
-  <ChatBubbleDemo />
+  <MessageDemo />
 </div>
 
 <RunDemo name="message" />
@@ -23,7 +23,7 @@ sub-components for full control over layout.
 Combine `Message` with `PromptInput` for a complete conversation view. Type a message and press Enter.
 
 <div className="my-8">
-  <ChatBubbleWithInputDemo />
+  <MessageWithInputDemo />
 </div>
 
 ## Installation

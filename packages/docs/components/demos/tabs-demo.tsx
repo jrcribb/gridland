@@ -135,7 +135,7 @@ function ContentTabBarApp() {
 
 // ── Exports ──────────────────────────────────────────────────────────────
 
-export function TabBarSimpleDemo() {
+export function TabsSimpleDemo() {
   return (
     <DemoWindow title="TabBar" tuiStyle={{ width: "100%", height: 120 }}>
       <SimpleTabBarApp />
@@ -143,7 +143,7 @@ export function TabBarSimpleDemo() {
   )
 }
 
-export default function TabBarDemo() {
+export default function TabsDemo() {
   return (
     <DemoWindow title="Tabs – with content" tuiStyle={{ width: "100%", height: 380 }}>
       <ContentTabBarApp />

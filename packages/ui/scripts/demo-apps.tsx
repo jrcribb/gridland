@@ -807,7 +807,7 @@ export const demos: Demo[] = [
   { name: "prompt-input", app: () => <PromptInputApp /> },
   { name: "text-input", app: () => <TextInputApp /> },
   { name: "link", app: () => <LinkApp /> },
-  { name: "tab-bar", app: () => <TabBarApp /> },
+  { name: "tabs", app: () => <TabBarApp /> },
   { name: "status-bar", app: () => <StatusBarApp /> },
   { name: "modal", app: () => <ModalApp /> },
   { name: "primitives", app: () => <PrimitivesApp /> },
@@ -815,6 +815,6 @@ export const demos: Demo[] = [
   { name: "timeline", app: () => <TimelineApp /> },
   { name: "message", app: () => <MessageApp /> },
   { name: "ai-chat", app: () => <AIChat useKeyboard={useKeyboard} /> },
-  { name: "terminal", app: () => <TerminalWindowApp /> },
+  { name: "terminal-window", app: () => <TerminalWindowApp /> },
   { name: "landing", app: () => <LandingApp useKeyboard={useKeyboard} /> },
 ]

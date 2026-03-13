@@ -10,7 +10,7 @@ const RESPONSE = "I've refactored the auth module. The changes include extractin
 
 type Phase = "idle" | "streaming" | "done"
 
-function MessageDemo() {
+function MessageDemoApp() {
   const [phase, setPhase] = useState<Phase>("idle")
   const [streamedText, setStreamedText] = useState("")
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -82,10 +82,10 @@ function MessageDemo() {
   )
 }
 
-export default function ChatBubbleDemo() {
+export default function MessageDemo() {
   return (
     <DemoWindow title="Message" tuiStyle={{ width: "100%", height: 300 }}>
-      <MessageDemo />
+      <MessageDemoApp />
     </DemoWindow>
   )
 }
@@ -147,7 +147,7 @@ function MessageWithInputApp() {
   )
 }
 
-export function ChatBubbleWithInputDemo() {
+export function MessageWithInputDemo() {
   return (
     <DemoWindow title="Message + PromptInput" tuiStyle={{ width: "100%", height: 400 }}>
       <MessageWithInputApp />
