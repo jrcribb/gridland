@@ -48,9 +48,6 @@ This initializes the [opentui](https://github.com/anomalyco/opentui) submodule, 
 bun run dev
 # -> http://localhost:5173
 
-# Docs site
-bun run dev:docs
-
 # Tests
 bun run test
 
