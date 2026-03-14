@@ -86,7 +86,7 @@
     },
     "packages/create-gridland": {
       "name": "create-gridland",
-      "version": "0.2.20",
+      "version": "0.2.22",
       "bin": {
         "create-gridland": "./dist/index.js",
       },
@@ -185,6 +185,7 @@
       "name": "@gridland/web",
       "version": "0.2.22",
       "dependencies": {
+        "@gridland/core": "workspace:*",
         "diff": "^8.0.3",
         "events": "^3.3.0",
         "marked": "^17.0.3",

@@ -2,7 +2,9 @@ import React, { type ReactNode } from "react"
 import type { BrowserRenderer } from "./browser-renderer"
 import { BrowserContext } from "./browser-context"
 
-// Import from opentui react through Vite aliases
+// Import from opentui source paths — esbuild rewrites these to @gridland/core
+// at build time (see build-shims.mjs), ensuring shared React context instances
+// with core's hooks at runtime.
 import { _render } from "../../../opentui/packages/react/src/reconciler/reconciler"
 import { AppContext } from "../../../opentui/packages/react/src/components/app"
 // eslint-disable-next-line @typescript-eslint/no-require-imports

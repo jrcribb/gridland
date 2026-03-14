@@ -11,7 +11,15 @@ import { createShimPlugin, requireShimBanner } from "./build-shims.mjs"
 
 const pkgRoot = path.dirname(fileURLToPath(import.meta.url))
 
-const shimPlugin = createShimPlugin(pkgRoot)
+// Web externalizes @gridland/core and redirects @opentui/react to it.
+// This ensures web uses the same React contexts as core at runtime.
+const shimPlugin = createShimPlugin(pkgRoot, {
+  externalRewrites: {
+    "@opentui/core": "@gridland/core",
+    "@opentui/react": "@gridland/core",
+  },
+  externalizeOpentuiTo: "@gridland/core",
+})
 
 const shared = {
   bundle: true,
@@ -20,7 +28,7 @@ const shared = {
   target: "esnext",
   mainFields: ["module", "browser", "main"],
   conditions: ["import", "browser"],
-  external: ["react", "react-dom"],
+  external: ["react", "react-dom", "@gridland/core"],
   plugins: [shimPlugin],
   sourcemap: true,
   outdir: path.resolve(pkgRoot, "dist"),
