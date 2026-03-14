@@ -26,20 +26,20 @@ describe("PromptInput behavior", () => {
     expect(screen.text()).toContain(">")
   })
 
-  it("shows input when not disabled", () => {
+  it("shows cursor when not disabled", () => {
     const { screen } = renderTui(
-      <PromptInput placeholder="Type here..." />,
+      <PromptInput />,
       { cols: 40, rows: 4 },
     )
-    expect(screen.text()).toContain("Type here...")
+    expect(screen.text()).toContain("\u258D")
   })
 
-  it("shows status text when disabled", () => {
+  it("hides cursor when disabled", () => {
     const { screen } = renderTui(
-      <PromptInput disabled disabledText="Waiting..." />,
+      <PromptInput disabled />,
       { cols: 40, rows: 4 },
     )
-    expect(screen.text()).toContain("Waiting...")
+    expect(screen.text()).not.toContain("\u258D")
   })
 
   it("shows disabled text when disabled", () => {

@@ -1,4 +1,3 @@
-// @ts-nocheck — OpenTUI intrinsic elements conflict with React's HTML/SVG types
 import {
   useState,
   useRef,
@@ -120,7 +119,6 @@ export interface PromptInputContextValue {
   maxSuggestions: number
   errorText: string
   theme: ReturnType<typeof useTheme>
-  onInput: (v: string) => void
 }
 
 const PromptInputContext = createContext<PromptInputContextValue | null>(null)
@@ -270,30 +268,26 @@ function PromptInputSuggestions() {
   )
 }
 
-/** Prompt char + input with cursor. */
+const CURSOR_CHAR = "\u258D"
+
+/** Prompt char + text with syntax highlighting + cursor. */
 function PromptInputTextarea() {
-  const { value, disabled, statusHintText, placeholder, prompt, promptColor, theme, onInput } = usePromptInput()
-  const empty = value.length === 0
+  const { value, disabled, statusHintText, placeholder, prompt, promptColor, theme } = usePromptInput()
   return (
-    <box flexDirection="row">
-      <text><span style={textStyle({ fg: promptColor })}>{prompt}</span></text>
-      {disabled ? (
-        <text>
-          <span style={textStyle({ dim: true, fg: theme.placeholder })}>{statusHintText}</span>
-        </text>
+    <text>
+      <span style={textStyle({ fg: promptColor })}>{prompt}</span>
+      {value.length === 0 ? (
+        <>
+          {!disabled && <span style={textStyle({ fg: theme.muted })}>{CURSOR_CHAR}</span>}
+          <span style={textStyle({ dim: true, fg: theme.placeholder })}>{disabled ? statusHintText : " " + placeholder}</span>
+        </>
       ) : (
-        <input
-          value={value}
-          placeholder={placeholder}
-          focused
-          onInput={onInput}
-          cursorColor={theme.muted}
-          cursorStyle={{ style: "line", blinking: empty }}
-          placeholderColor={theme.placeholder}
-          textColor={theme.foreground}
-        />
+        <>
+          <span style={textStyle({ fg: theme.foreground })}>{value}</span>
+          {!disabled && <span style={textStyle({ fg: theme.muted })}>{CURSOR_CHAR}</span>}
+        </>
       )}
-    </box>
+    </text>
   )
 }
 
@@ -598,10 +592,6 @@ export function PromptInput({
 
   const visibleSuggestions = suggestions.slice(0, maxSuggestions)
 
-  const handleInput = useCallback((v: string) => {
-    updateValue(v)
-  }, [updateValue])
-
   const ctxValue: PromptInputContextValue = {
     value,
     disabled,
@@ -616,7 +606,6 @@ export function PromptInput({
     maxSuggestions,
     errorText,
     theme,
-    onInput: handleInput,
   }
 
   // ── Render ─────────────────────────────────────────────────────────────
