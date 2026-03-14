@@ -8,6 +8,16 @@ const CLI_PATH = join(DEMO_DIR, "bin/cli.mjs")
 const DIST_PATH = join(DEMO_DIR, "dist/run.js")
 const NAMES_PATH = join(DEMO_DIR, "dist/demo-names.json")
 
+/** Read all dist JS files concatenated (run.js + any shared chunks) */
+function readDistBundle(): string {
+  const { readdirSync } = require("node:fs")
+  const distDir = join(DEMO_DIR, "dist")
+  return readdirSync(distDir)
+    .filter((f: string) => f.endsWith(".js"))
+    .map((f: string) => readFileSync(join(distDir, f), "utf-8"))
+    .join("\n")
+}
+
 const AVAILABLE_DEMOS = [
   "gradient", "ascii", "table", "spinner", "select-input",
   "multi-select", "prompt-input", "text-input", "link", "tabs", "status-bar",
@@ -74,7 +84,7 @@ describe("bundle", () => {
   })
 
   test("inlines @gridland/ui components (not external)", () => {
-    const source = readFileSync(DIST_PATH, "utf-8")
+    const source = readDistBundle()
     // UI components should be inlined, not imported from @gridland/ui
     expect(source).not.toContain('from "@gridland/ui"')
     // Verify key components are present in the bundle
@@ -90,7 +100,7 @@ describe("bundle", () => {
   })
 
   test("inlines landing app components (not external)", () => {
-    const source = readFileSync(DIST_PATH, "utf-8")
+    const source = readDistBundle()
     expect(source).toContain("LandingApp")
     expect(source).toContain("MatrixBackground")
     expect(source).toContain("AboutModal")
@@ -98,7 +108,7 @@ describe("bundle", () => {
   })
 
   test("keeps runtime deps external", () => {
-    const source = readFileSync(DIST_PATH, "utf-8")
+    const source = readDistBundle()
     expect(source).toContain('from "react"')
     expect(source).toContain('from "@opentui/core"')
     expect(source).toContain('from "@opentui/react"')

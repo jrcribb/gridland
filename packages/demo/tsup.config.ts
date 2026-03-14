@@ -2,7 +2,7 @@ import { defineConfig } from "tsup"
 import { resolve } from "path"
 
 export default defineConfig({
-  entry: { run: "src/run.tsx" },
+  entry: { run: "src/run.tsx", landing: "src/landing.tsx" },
   format: ["esm"],
   dts: false,
   sourcemap: false,
