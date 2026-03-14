@@ -1,0 +1,55 @@
+---
+title: useKeyboard
+description: Subscribe to keyboard events
+---
+
+The `useKeyboard` hook subscribes to keyboard events inside a `<TUI>` component.
+By default it receives press events (including key repeats). Use `options.release`
+to also receive release events.
+
+```tsx title="Import"
+import { useKeyboard } from "@gridland/web"
+```
+
+## Usage
+
+```tsx title="Basic"
+useKeyboard((event) => {
+  if (event.name === "q") quit()
+  if (event.name === "return") submit()
+})
+```
+
+```tsx title="With modifiers"
+useKeyboard((event) => {
+  if (event.ctrl && event.name === "s") save()
+  if (event.shift && event.name === "Tab") focusPrevious()
+})
+```
+
+```tsx title="With release events"
+useKeyboard((event) => {
+  if (event.eventType === "release") {
+    heldKeys.delete(event.name)
+  } else {
+    heldKeys.add(event.name)
+  }
+}, { release: true })
+```
+
+## Parameters
+
+| Param | Type | Default | Description |
+|-------|------|---------|-------------|
+| `handler` | `(key: KeyEvent) => void` | -- | Called on each keypress |
+| `options.release` | `boolean` | `false` | Also receive key release events |
+
+## KeyEvent
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | Key name (`"a"`, `"return"`, `"escape"`, `"up"`, etc.) |
+| `ctrl` | `boolean` | Whether Ctrl was held |
+| `shift` | `boolean` | Whether Shift was held |
+| `repeated` | `boolean` | Whether this is a key repeat |
+| `eventType` | `"press" \| "release"` | Only present when `release: true` |

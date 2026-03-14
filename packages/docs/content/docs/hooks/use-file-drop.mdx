@@ -1,0 +1,49 @@
+---
+title: useFileDrop
+description: Listen for file drops onto the canvas
+---
+
+The `useFileDrop` hook listens for file drops onto the canvas and provides
+drag-over state for visual feedback.
+
+```tsx title="Import"
+import { useFileDrop } from "@gridland/web"
+```
+
+## Usage
+
+```tsx title="Basic"
+function FileDropZone() {
+  const { isDragOver } = useFileDrop((file) => {
+    console.log(`Dropped: ${file.name} (${file.size} bytes)`)
+    console.log(file.content)
+  })
+
+  return (
+    <box border borderColor={isDragOver ? "green" : "gray"}>
+      <text>{isDragOver ? "Drop here!" : "Drag a file here"}</text>
+    </box>
+  )
+}
+```
+
+## Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `callback` | `(file: DroppedFile) => void` | Called when a file is dropped |
+
+## Returns
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isDragOver` | `boolean` | `true` while a file is being dragged over the canvas |
+
+## DroppedFile
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | File name |
+| `content` | `string` | File content as a string |
+| `type` | `string` | MIME type |
+| `size` | `number` | File size in bytes |

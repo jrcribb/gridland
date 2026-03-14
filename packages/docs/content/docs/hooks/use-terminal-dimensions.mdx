@@ -1,0 +1,41 @@
+---
+title: useTerminalDimensions
+description: Get the current terminal dimensions
+---
+
+The `useTerminalDimensions` hook returns the current terminal dimensions in
+columns and rows. It automatically updates when the terminal is resized.
+
+```tsx title="Import"
+import { useTerminalDimensions } from "@gridland/web"
+```
+
+## Usage
+
+```tsx title="Basic"
+function MyComponent() {
+  const { width, height } = useTerminalDimensions()
+
+  return (
+    <text>Terminal is {width}x{height}</text>
+  )
+}
+```
+
+```tsx title="Responsive layout"
+function ResponsiveLayout() {
+  const { width } = useTerminalDimensions()
+
+  if (width < 60) {
+    return <NarrowLayout />
+  }
+  return <WideLayout />
+}
+```
+
+## Returns
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `width` | `number` | Terminal width in columns |
+| `height` | `number` | Terminal height in rows |

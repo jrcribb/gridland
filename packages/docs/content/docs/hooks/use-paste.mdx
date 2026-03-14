@@ -1,0 +1,30 @@
+---
+title: usePaste
+description: Listen for paste events on the canvas
+---
+
+The `usePaste` hook listens for paste events (Ctrl+V / Cmd+V) on the canvas.
+
+```tsx title="Import"
+import { usePaste } from "@gridland/web"
+```
+
+## Usage
+
+```tsx title="Basic"
+function Editor() {
+  const [text, setText] = useState("")
+
+  usePaste((pasted) => {
+    setText((prev) => prev + pasted)
+  })
+
+  return <text>{text}</text>
+}
+```
+
+## Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `callback` | `(text: string) => void` | Called with the pasted text |
