@@ -25,6 +25,92 @@ import { gridlandWebPlugin } from "@gridland/web/vite-plugin"
 Returns an array of Vite plugins that configure module resolution for the opentui engine.
 Resolves `@opentui/core`, `@opentui/react`, and `@opentui/ui` from peer dependencies.
 
+## Hooks
+
+### `useKeyboard(handler, options?)`
+
+Subscribe to keyboard events inside a `<TUI>` component.
+
+```tsx title="Import"
+import { useKeyboard } from "@gridland/web"
+```
+
+```tsx title="Usage"
+useKeyboard((event) => {
+  if (event.name === "q") quit()
+  if (event.name === "return") submit()
+})
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `handler` | `(key: KeyEvent) => void` | Called on each keypress |
+| `options.release` | `boolean` | Also receive key release events (default: `false`) |
+
+The `KeyEvent` object includes:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | Key name (`"a"`, `"return"`, `"escape"`, `"up"`, etc.) |
+| `ctrl` | `boolean` | Whether Ctrl was held |
+| `shift` | `boolean` | Whether Shift was held |
+| `repeated` | `boolean` | Whether this is a key repeat |
+| `eventType` | `"press" \| "release"` | Only present when `release: true` |
+
+### `useTerminalDimensions()`
+
+Returns the current terminal dimensions in columns and rows. Automatically updates on resize.
+
+```tsx title="Import"
+import { useTerminalDimensions } from "@gridland/web"
+```
+
+```tsx title="Usage"
+const { width, height } = useTerminalDimensions()
+```
+
+**Returns:** `{ width: number, height: number }`
+
+### `useFileDrop(callback)`
+
+Listen for file drops onto the canvas.
+
+```tsx title="Import"
+import { useFileDrop } from "@gridland/web"
+```
+
+```tsx title="Usage"
+const { isDragOver } = useFileDrop((file) => {
+  console.log(file.name, file.content)
+})
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `callback` | `(file: DroppedFile) => void` | Called when a file is dropped |
+
+**Returns:** `{ isDragOver: boolean }` — `true` while a file is being dragged over the canvas.
+
+`DroppedFile` includes `name`, `content` (string), `type` (MIME), and `size` (bytes).
+
+### `usePaste(callback)`
+
+Listen for paste events on the canvas.
+
+```tsx title="Import"
+import { usePaste } from "@gridland/web"
+```
+
+```tsx title="Usage"
+usePaste((text) => {
+  insertText(text)
+})
+```
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `callback` | `(text: string) => void` | Called with the pasted text |
+
 ## Internal Modules
 
 <Callout type="warn">
