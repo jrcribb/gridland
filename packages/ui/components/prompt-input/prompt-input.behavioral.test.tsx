@@ -31,7 +31,7 @@ describe("PromptInput behavior", () => {
       <PromptInput />,
       { cols: 40, rows: 4 },
     )
-    expect(screen.text()).toContain("▍")
+    expect(screen.text()).toContain("\u258D")
   })
 
   it("hides cursor when disabled", () => {
@@ -39,7 +39,7 @@ describe("PromptInput behavior", () => {
       <PromptInput disabled />,
       { cols: 40, rows: 4 },
     )
-    expect(screen.text()).not.toContain("▍")
+    expect(screen.text()).not.toContain("\u258D")
   })
 
   it("shows disabled text when disabled", () => {
