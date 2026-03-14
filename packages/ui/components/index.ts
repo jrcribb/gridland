@@ -70,12 +70,6 @@ export type {
 export { TerminalWindow } from "./terminal-window/terminal-window"
 export type { TerminalWindowProps } from "./terminal-window/terminal-window"
 
-export { CornerRibbon, BadgeButton, TextBadge } from "./made-with-opentui/made-with-opentui"
-export type { CornerRibbonProps, BadgeButtonProps, TextBadgeProps } from "./made-with-opentui/made-with-opentui"
-
-export { GridlandCornerRibbon, GridlandBadgeButton, GridlandTextBadge } from "./made-with-gridland/made-with-gridland"
-export type { GridlandCornerRibbonProps, GridlandBadgeButtonProps, GridlandTextBadgeProps } from "./made-with-gridland/made-with-gridland"
-
 export { textStyle } from "./text-style"
 
 export { ThemeProvider, useTheme, darkTheme, lightTheme } from "./theme"
