@@ -1,6 +1,6 @@
 {
   "name": "@gridland/web",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "type": "module",
   "exports": {
     ".": {
@@ -28,7 +28,10 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src/shims",
+    "src/core-shims",
+    "src/browser-buffer.ts"
   ],
   "scripts": {
     "build": "tsup; node build-browser.mjs",

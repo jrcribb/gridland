@@ -18,5 +18,18 @@ export function extname(p: string): string {
   const idx = base.lastIndexOf(".")
   return idx >= 0 ? base.slice(idx) : ""
 }
+export function parse(p: string): { root: string; dir: string; base: string; ext: string; name: string } {
+  const dir = dirname(p)
+  const base = basename(p)
+  const ext = extname(p)
+  const name = ext ? base.slice(0, -ext.length) : base
+  return { root: p.startsWith("/") ? "/" : "", dir, base, ext, name }
+}
+export function isAbsolute(p: string): boolean {
+  return p.startsWith("/")
+}
+export function relative(from: string, to: string): string {
+  return to.replace(from, "").replace(/^\//, "")
+}
 export const sep = "/"
-export default { join, resolve, dirname, basename, extname, sep }
+export default { join, resolve, dirname, basename, extname, parse, isAbsolute, relative, sep }

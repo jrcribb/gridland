@@ -1,5 +1,6 @@
 import { type Plugin } from "vite"
 import path from "path"
+import { existsSync } from "fs"
 import { createRequire } from "module"
 import { fileURLToPath } from "url"
 
@@ -19,20 +20,48 @@ const __dirname = path.dirname(__filename)
 export function gridlandWebPlugin(): Plugin[] {
   const pkgRoot = path.resolve(__dirname, "..")
   const _require = createRequire(path.resolve(pkgRoot, "package.json"))
+  // Separate require for resolving opentui packages from the consumer project's
+  // node_modules (not from @gridland/web's location, which may differ when
+  // using file: links or in monorepo setups).
+  const _projectRequire = createRequire(path.resolve(process.cwd(), "package.json"))
 
   // Resolve opentui package roots — try installed packages first,
-  // fall back to git submodule for monorepo development
+  // fall back to git submodule for monorepo development.
+  // Some packages restrict their exports map (no ./package.json),
+  // so we try the main entry point as a fallback.
   function resolvePackageRoot(pkg: string, fallbackRelative: string): string {
-    try {
-      const pkgJson = _require.resolve(`${pkg}/package.json`)
-      return path.dirname(pkgJson)
-    } catch {
-      return path.resolve(pkgRoot, fallbackRelative)
+    // Try multiple require contexts: project-level first (for consumer apps),
+    // then @gridland/web-level (for monorepo dev). This ensures we find
+    // packages in the consumer's node_modules, not just our own.
+    for (const req of [_projectRequire, _require]) {
+      try {
+        const pkgJson = req.resolve(`${pkg}/package.json`)
+        return path.dirname(pkgJson)
+      } catch {
+        try {
+          // Package exists but doesn't expose package.json in exports map.
+          // Resolve the main entry and derive the root from it.
+          const entry = req.resolve(pkg)
+          let dir = path.dirname(entry)
+          for (let i = 0; i < 5; i++) {
+            if (existsSync(path.join(dir, "package.json"))) return dir
+            dir = path.dirname(dir)
+          }
+        } catch {
+          // Package not installed in this context
+        }
+      }
     }
+    return path.resolve(pkgRoot, fallbackRelative)
   }
   const coreRoot = resolvePackageRoot("@opentui/core", "../../opentui/packages/core")
   const reactRoot = resolvePackageRoot("@opentui/react", "../../opentui/packages/react")
   const uiRoot = resolvePackageRoot("@opentui/ui", "../../opentui/packages/ui")
+
+  // Detect whether opentui packages have TypeScript source (monorepo/submodule)
+  // or only compiled JS (npm install). When source is available, we resolve
+  // imports to .ts files and apply shims. Otherwise, let Vite handle them normally.
+  const hasSource = existsSync(path.resolve(reactRoot, "src/index.ts"))
 
   const coreShims = path.resolve(pkgRoot, "src/core-shims/index.ts")
   const opentuiCoreBarrel = path.resolve(coreRoot, "src/index.ts")
@@ -82,6 +111,7 @@ export function gridlandWebPlugin(): Plugin[] {
     "node:stream": "src/shims/node-stream.ts",
     url: "src/shims/node-url.ts",
     "node:url": "src/shims/node-url.ts",
+    console: "src/shims/console.ts",
     bun: "src/shims/bun-ffi.ts",
   }
 
@@ -102,41 +132,54 @@ export function gridlandWebPlugin(): Plugin[] {
       // Virtual module redirects should not be re-intercepted
       if (importer.startsWith(NPM_REDIRECT)) return null
 
-      // Check if importer is in an opentui package
+      // Check if importer is in an opentui package.
+      // Use both resolved root paths AND path-based matching to handle
+      // multiple copies (e.g. bun's cache when using file: links).
       const isExternalOpentui =
         importer.startsWith(coreRoot + path.sep) ||
         importer.startsWith(reactRoot + path.sep) ||
-        importer.startsWith(uiRoot + path.sep)
+        importer.startsWith(uiRoot + path.sep) ||
+        importer.includes("/@opentui/core/") ||
+        importer.includes("/@opentui/react/") ||
+        importer.includes("/@opentui/ui/")
+
+      // Source-mode-only shims: slider circular dep fix, relative import
+      // shims, tree-sitter stubs, and node built-in stubs only apply when
+      // processing opentui TypeScript source (monorepo/submodule).
+      // Compiled npm packages have these already resolved.
 
       // Slider circular dep fix
-      if (source === "../index" && importer === sliderFile) {
+      if (hasSource && source === "../index" && importer === sliderFile) {
         return sliderDeps
       }
 
-      // Resolve @opentui packages
-      if (source === "@opentui/ui") {
-        return path.resolve(uiRoot, "src/index.ts")
-      }
-      if (source === "@opentui/react") {
-        return path.resolve(reactRoot, "src/index.ts")
-      }
-
-      // @opentui/core routing
-      if (source === "@opentui/core") {
-        if (importer.startsWith(reactRoot + path.sep)) {
-          return opentuiCoreBarrel
+      // Resolve @opentui packages — only intercept when we have source files.
+      // When using npm-installed packages (compiled JS), let Vite resolve normally.
+      if (hasSource) {
+        if (source === "@opentui/ui") {
+          return path.resolve(uiRoot, "src/index.ts")
         }
-        return coreShims
-      }
+        if (source === "@opentui/react") {
+          return path.resolve(reactRoot, "src/index.ts")
+        }
 
-      // @opentui/* subpath imports (e.g. @opentui/react/jsx-dev-runtime)
-      if (source.startsWith("@opentui/")) {
-        const parts = source.split("/")
-        const pkgName = parts[1] // "react", "core", "ui"
-        const subpath = parts.slice(2).join("/") // "jsx-dev-runtime"
-        if (subpath) {
-          const root = pkgRoots[pkgName]
-          if (root) return path.resolve(root, subpath + ".js")
+        // @opentui/core routing
+        if (source === "@opentui/core") {
+          if (importer.startsWith(reactRoot + path.sep)) {
+            return opentuiCoreBarrel
+          }
+          return coreShims
+        }
+
+        // @opentui/* subpath imports (e.g. @opentui/react/jsx-dev-runtime)
+        if (source.startsWith("@opentui/")) {
+          const parts = source.split("/")
+          const pkgName = parts[1] // "react", "core", "ui"
+          const subpath = parts.slice(2).join("/") // "jsx-dev-runtime"
+          if (subpath) {
+            const root = pkgRoots[pkgName]
+            if (root) return path.resolve(root, subpath + ".js")
+          }
         }
       }
 
@@ -148,19 +191,29 @@ export function gridlandWebPlugin(): Plugin[] {
         if (resolved.endsWith("devtools-polyfill")) {
           return path.resolve(pkgRoot, "src/shims/devtools-polyfill-stub.ts")
         }
-        const shim = resolvedCoreShims.get(resolved) || resolvedCoreShims.get(resolved + ".ts")
-        if (shim) return shim
-        const indexShim = resolvedCoreShims.get(resolved + "/index.ts")
-        if (indexShim) return indexShim
+        // Source-mode shims for core files (only when processing TS source)
+        if (hasSource) {
+          const shim = resolvedCoreShims.get(resolved) || resolvedCoreShims.get(resolved + ".ts")
+          if (shim) return shim
+          const indexShim = resolvedCoreShims.get(resolved + "/index.ts")
+          if (indexShim) return indexShim
+        }
       }
 
-      // Tree-sitter stubs
-      if (source.includes("tree-sitter") && isExternalOpentui) {
-        if (source.includes("tree-sitter-styled-text")) return styledTextStub
-        return treeStub
-      }
-      if (source.includes("hast-styled-text") && isExternalOpentui) {
-        return path.resolve(pkgRoot, "src/shims/hast-stub.ts")
+      // Tree-sitter and related stubs — needed in both source and npm mode
+      // since the compiled @opentui/core still imports these
+      if (isExternalOpentui) {
+        // Stub .scm and .wasm asset imports first (before tree-sitter name match)
+        if (source.endsWith(".scm") || source.endsWith(".wasm")) {
+          return "\0opentui-asset-stub"
+        }
+        if (source.includes("tree-sitter")) {
+          if (source.includes("tree-sitter-styled-text")) return styledTextStub
+          return treeStub
+        }
+        if (source.includes("hast-styled-text")) {
+          return path.resolve(pkgRoot, "src/shims/hast-stub.ts")
+        }
       }
 
       // Events shim — applies to ALL importers (browser-compatible EventEmitter)
@@ -168,23 +221,24 @@ export function gridlandWebPlugin(): Plugin[] {
         return path.resolve(pkgRoot, "src/shims/events-shim.ts")
       }
 
-      // Node.js built-in stubs (only for imports from the opentui monorepo,
-      // since our own workspace code doesn't import these)
+      // Node.js built-in stubs — needed in both modes since compiled
+      // @opentui/core still imports node builtins
       if (nodeShims[source] && isExternalOpentui) {
         return path.resolve(pkgRoot, nodeShims[source])
       }
 
-      // Redirect bare npm imports from external opentui to virtual modules.
-      // The virtual module re-exports from the bare package name, which lets
-      // Vite's normal resolver + pre-bundler handle CJS-to-ESM conversion.
-      // Skip @opentui/* since those are resolved above to monorepo source files.
-      if (!source.startsWith(".") && !source.startsWith("/") && !source.startsWith("@opentui/") && isExternalOpentui) {
+      // Redirect bare npm imports from external opentui to virtual modules (source mode only)
+      if (hasSource && !source.startsWith(".") && !source.startsWith("/") && !source.startsWith("@opentui/") && isExternalOpentui) {
         return NPM_REDIRECT + source
       }
 
       return null
     },
     load(id) {
+      // Stub for .scm/.wasm asset imports from compiled opentui packages
+      if (id === "\0opentui-asset-stub") {
+        return "export default null;"
+      }
       if (id.startsWith(NPM_REDIRECT)) {
         const pkg = id.slice(NPM_REDIRECT.length)
         // Discover export names by require()-ing the module at build time.
@@ -264,7 +318,8 @@ export function gridlandWebPlugin(): Plugin[] {
           // Pre-bundle npm packages imported by external opentui monorepo code.
           // These are resolved via virtual module redirects, so Vite's initial
           // crawl won't discover them — they must be listed explicitly.
-          include: [
+          // Only needed in source mode; compiled npm packages are discovered normally.
+          include: hasSource ? [
             "react",
             "react-dom",
             "react-reconciler",
@@ -272,6 +327,9 @@ export function gridlandWebPlugin(): Plugin[] {
             "diff",
             "yoga-layout",
             "marked",
+          ] : [
+            "react",
+            "react-dom",
           ],
         },
         server: {
