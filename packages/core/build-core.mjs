@@ -26,6 +26,24 @@ const requireShimBanner = [
   `if (typeof process === "undefined") var process = { env: {} };`,
 ].join(" ")
 
+// Browser file-level shims: replace native-backed opentui classes with browser implementations.
+// Must match the shims in @gridland/web's vite-plugin.
+const webRoot = path.resolve(pkgRoot, "../web")
+const browserFileShims = {
+  "buffer": path.resolve(webRoot, "src/browser-buffer.ts"),
+  "text-buffer": path.resolve(webRoot, "src/shims/text-buffer-shim.ts"),
+  "text-buffer-view": path.resolve(webRoot, "src/shims/text-buffer-view-shim.ts"),
+  "syntax-style": path.resolve(webRoot, "src/shims/syntax-style-shim.ts"),
+  "edit-buffer": path.resolve(webRoot, "src/shims/edit-buffer-stub.ts"),
+  "editor-view": path.resolve(webRoot, "src/shims/editor-view-stub.ts"),
+  "post/filters": path.resolve(webRoot, "src/shims/filters-stub.ts"),
+  "animation/Timeline": path.resolve(webRoot, "src/shims/timeline-stub.ts"),
+}
+const resolvedBrowserShims = new Map()
+for (const [key, shimPath] of Object.entries(browserFileShims)) {
+  resolvedBrowserShims.set(path.resolve(opentuiRoot, "core/src", key + ".ts"), shimPath)
+}
+
 // Shared stubs for both builds
 function createBasePlugin({ stubNative = false } = {}) {
   return {
@@ -44,6 +62,17 @@ function createBasePlugin({ stubNative = false } = {}) {
           contents: "export const CliRenderer = null; export const CliRenderEvents = null; export const createCliRenderer = null; export const NativeSpanFeed = null; export const setRenderLibPath = () => {};",
           loader: "js",
         }))
+        // Browser build: redirect native-backed opentui files to browser shims
+        build.onResolve({ filter: /.*/ }, (args) => {
+          if (!args.resolveDir || !args.path.startsWith(".")) return null
+          const resolved = path.resolve(args.resolveDir, args.path)
+          // Check with and without .ts extension
+          for (const candidate of [resolved, resolved + ".ts"]) {
+            const shim = resolvedBrowserShims.get(candidate)
+            if (shim) return { path: shim }
+          }
+          return null
+        })
       } else {
         build.onResolve({ filter: /^@opentui\/core\/native$/ }, () => ({
           path: path.resolve(opentuiRoot, "core/src/native.ts"),
