@@ -33,6 +33,18 @@ beforeAll(() => {
   }
 })
 
+describe("tarball hygiene", () => {
+  it("no workspace:* in packed package.json files", () => {
+    for (const [name, tarball] of Object.entries(tarballs)) {
+      const extractDir = fs.mkdtempSync(path.join(os.tmpdir(), "tarball-check-"))
+      execSync(`tar xzf ${tarball} -C ${extractDir}`, { timeout: 10000 })
+      const pkgJson = fs.readFileSync(path.join(extractDir, "package", "package.json"), "utf-8")
+      fs.rmSync(extractDir, { recursive: true, force: true })
+      expect(pkgJson).not.toContain("workspace:")
+    }
+  })
+})
+
 let tmpDir: string
 
 beforeEach(() => {
