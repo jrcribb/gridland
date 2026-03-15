@@ -11,18 +11,16 @@ function shimPath(p: string) {
   return path.resolve(pkgRoot, p)
 }
 
-// Core shims — same mappings as the Vite plugin
+// Core shims — same mappings as the Vite/Next.js plugins.
+// No longer needed for: zig (zig-registry.ts is browser-safe),
+// renderer, console, NativeSpanFeed (not in browser barrel).
 const coreFileShims: Record<string, string> = {
-  zig: "src/shims/zig-stub.ts",
   buffer: "src/browser-buffer.ts",
   "text-buffer": "src/shims/text-buffer-shim.ts",
   "text-buffer-view": "src/shims/text-buffer-view-shim.ts",
   "syntax-style": "src/shims/syntax-style-shim.ts",
-  renderer: "src/shims/renderer-stub.ts",
-  console: "src/shims/console-stub.ts",
   "edit-buffer": "src/shims/edit-buffer-stub.ts",
   "editor-view": "src/shims/editor-view-stub.ts",
-  NativeSpanFeed: "src/shims/native-span-feed-stub.ts",
   "post/filters": "src/shims/filters-stub.ts",
   "animation/Timeline": "src/shims/timeline-stub.ts",
 }
@@ -41,11 +39,12 @@ const nextConfig: NextConfig = {
   webpack: (config, { isServer, webpack }) => {
     const sharedAliases: Record<string, string> = {
       // @opentui packages
-      "@gridland/core": shimPath("src/core-shims-entry.ts"),
-      "@opentui/core": shimPath("src/core-shims/index.ts"),
+      "@opentui/core$": path.resolve(opentui, "packages/core/src/index.ts"),
+      "@opentui/core/native": shimPath("src/shims/renderer-stub.ts"),
       "@opentui/react": path.resolve(opentui, "packages/react/src/index.ts"),
       // Convenience aliases for docs imports
       "opentui-web": path.resolve(pkgRoot, "src/index.ts"),
+      "@gridland/core": path.resolve(__dirname, "../core/src/browser.ts"),
       "@gridland/web": path.resolve(pkgRoot, "src/index.ts"),
       "opentui-ui": path.resolve(__dirname, "../ui/components/index.ts"),
       "@gridland/ui": path.resolve(__dirname, "../ui/components/index.ts"),
@@ -95,6 +94,7 @@ const nextConfig: NextConfig = {
     if (!isServer) {
       const clientAliases: Record<string, string> = {
         "node:console": shimPath("src/shims/console.ts"),
+        "console$": shimPath("src/shims/console.ts"),
         "events$": shimPath("src/shims/events-shim.ts"),
         "fs/promises": shimPath("src/shims/node-fs.ts"),
         "fs$": shimPath("src/shims/node-fs.ts"),

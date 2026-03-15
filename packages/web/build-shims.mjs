@@ -49,7 +49,6 @@ export function createCoreFileShims(pkgRoot) {
   const coreRoot = path.resolve(webRoot, "../../opentui/packages/core")
 
   const coreFileShimDefs = {
-    zig: "src/shims/zig-stub.ts",
     buffer: "src/browser-buffer.ts",
     "text-buffer": "src/shims/text-buffer-shim.ts",
     "text-buffer-view": "src/shims/text-buffer-view-shim.ts",

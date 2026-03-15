@@ -3,11 +3,11 @@
 exports[`TextInput snapshots renders with placeholder 1`] = `
 "
 
-  Error: Zig render library not available in test environment"
+  Error: No RenderLib registered. In Bun, import '@opentui/core' or"
 `;
 
 exports[`TextInput snapshots renders with custom prompt 1`] = `
 "
 
-  Error: Zig render library not available in test environment"
+  Error: No RenderLib registered. In Bun, import '@opentui/core' or"
 `;

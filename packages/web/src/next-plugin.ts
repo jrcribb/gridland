@@ -15,9 +15,11 @@ interface NextConfig {
  * FFI shims, tree-sitter stubs, Node.js built-in stubs, and circular
  * dependency fixes.
  *
- * Requires @opentui/core, @opentui/react, and @opentui/ui as peer dependencies.
+ * In **npm mode**, @gridland/core resolves via package.json conditional exports
+ * ("import" → dist/browser.js). No aliasing needed.
  *
- * @param nextConfig - Optional additional Next.js config to merge
+ * In **source mode**, the plugin handles @opentui/* resolution and file-level
+ * browser shims for native-backed classes.
  */
 export function withGridland(nextConfig: NextConfig = {}): NextConfig {
   // __dirname works natively in CJS; tsup shims it for ESM via import.meta.url
@@ -31,25 +33,21 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
 
   // Detect whether opentui source is available (monorepo/submodule)
   const hasSource = existsSync(path.resolve(reactRoot, "src/index.ts"))
-  // Pre-compiled core-shims for npm mode (no monorepo-relative paths)
-  const compiledCoreShims = path.resolve(pkgRoot, "dist/core-shims.js")
 
   function shimPath(p: string) {
     return path.resolve(pkgRoot, p)
   }
 
-  // Core shims — same mappings as the Vite plugin
+  // File-level shims — browser replacements for native-backed classes.
+  // NOT needed for: zig (zig-registry.ts is browser-safe), renderer, console,
+  // NativeSpanFeed (no longer in browser barrel).
   const coreFileShims: Record<string, string> = {
-    zig: "src/shims/zig-stub.ts",
     buffer: "src/browser-buffer.ts",
     "text-buffer": "src/shims/text-buffer-shim.ts",
     "text-buffer-view": "src/shims/text-buffer-view-shim.ts",
     "syntax-style": "src/shims/syntax-style-shim.ts",
-    renderer: "src/shims/renderer-stub.ts",
-    console: "src/shims/console-stub.ts",
     "edit-buffer": "src/shims/edit-buffer-stub.ts",
     "editor-view": "src/shims/editor-view-stub.ts",
-    NativeSpanFeed: "src/shims/native-span-feed-stub.ts",
     "post/filters": "src/shims/filters-stub.ts",
     "animation/Timeline": "src/shims/timeline-stub.ts",
   }
@@ -66,18 +64,13 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
         config = userWebpack(config, context)
       }
 
-      // Aliases needed on BOTH server and client (opentui packages, FFI stubs,
-      // tree-sitter stubs, core file shims). The server doesn't actually render
-      // the TUI but still walks the module graph for "use client" components.
       const sharedAliases: Record<string, string> = {
-        // In npm mode, @gridland/core bundles real opentui with native deps
-        // that browsers can't handle. Alias it to the core-shims bundle instead.
-        ...(!hasSource ? { "@gridland/core": compiledCoreShims } : {}),
+        // npm mode: @gridland/core resolves via package.json conditional exports.
+        // No alias needed.
 
         // @opentui packages — source mode only (monorepo dev)
         ...(hasSource ? {
-          "@gridland/core": shimPath("src/core-shims-entry.ts"),
-          "@opentui/core": shimPath("src/core-shims/index.ts"),
+          "@opentui/core": path.resolve(coreRoot, "src/index.ts"),
           "@opentui/react": path.resolve(reactRoot, "src/index.ts"),
           "@opentui/ui": path.resolve(uiRoot, "src/index.ts"),
         } : {}),
@@ -92,8 +85,7 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
         "web-tree-sitter": shimPath("src/shims/tree-sitter-stub.ts"),
         "hast-styled-text": shimPath("src/shims/hast-stub.ts"),
 
-        // Source-mode-only aliases: opentui source directories and file shims.
-        // In npm mode, these are already compiled into the core-shims bundle.
+        // Source-mode-only aliases
         ...(hasSource ? {
           [path.resolve(coreRoot, "src/lib/tree-sitter-styled-text")]:
             shimPath("src/shims/tree-sitter-styled-text-stub.ts"),
@@ -119,8 +111,7 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
         ...sharedAliases,
       }
 
-      // Allow webpack to resolve workspace packages (e.g. @gridland/core)
-      // from the consuming project's and monorepo root node_modules
+      // Allow webpack to resolve workspace packages
       config.resolve.modules = [
         ...(config.resolve.modules || []),
         path.resolve(process.cwd(), "node_modules"),
@@ -142,7 +133,6 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
 
       if (!isServer) {
         // Client-only: Node.js built-in stubs, events shim, console shim.
-        // Use "$" suffix for exact match to prevent "fs" from matching "fs/promises".
         const clientAliases: Record<string, string> = {
           "node:console": shimPath("src/shims/console.ts"),
           "events$": shimPath("src/shims/events-shim.ts"),
@@ -160,8 +150,7 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
           ...clientAliases,
         }
 
-        // Strip `node:` and `bun:` prefixes from imports so they resolve
-        // through aliases. Webpack 5 treats these as unhandled URL schemes.
+        // Strip `node:` and `bun:` prefixes from imports
         config.plugins.push(
           new webpack.NormalModuleReplacementPlugin(/^node:/, (resource: any) => {
             resource.request = resource.request.replace(/^node:/, "")

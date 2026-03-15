@@ -17,6 +17,7 @@
     "sourceMap": true,
     "paths": {
       "@opentui/core": ["../web/src/core-shims/index.ts"],
+      "@opentui/core/native": ["../../opentui/packages/core/src/native.ts"],
       "@opentui/core/*": ["../web/src/core-shims/*"],
       "@opentui/react": ["../../opentui/packages/react/src/index.ts"],
       "@opentui/ui": ["../../opentui/packages/ui/src/index.ts"]

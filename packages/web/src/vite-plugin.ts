@@ -10,22 +10,22 @@ const __dirname = path.dirname(__filename)
 /**
  * Vite plugin that sets up module resolution for Gridland.
  *
- * In **npm mode** (published packages), the plugin simply aliases @gridland/core
- * to a pre-compiled browser-compatible bundle (dist/core-shims.js). No other
- * interception is needed since @gridland/web's published dist already has
- * all opentui code compiled in.
+ * In **npm mode** (published packages), @gridland/core resolves via its
+ * package.json conditional exports ("import" → dist/browser.js, which is
+ * browser-safe). No aliasing needed.
  *
- * In **source mode** (monorepo with opentui submodule), the plugin additionally
- * handles @opentui/* resolution, file-level browser shims, tree-sitter stubs,
- * node built-in stubs, and circular dependency fixes.
+ * In **source mode** (monorepo with opentui submodule), the plugin handles
+ * @opentui/* resolution, file-level browser shims for native-backed classes,
+ * tree-sitter stubs, node built-in stubs, and circular dependency fixes.
+ *
+ * Since @opentui/core's index.ts no longer exports native-only modules
+ * (zig, renderer, console, NativeSpanFeed), those shims are not needed.
+ * Consumer modules import from zig-registry.ts (browser-safe) instead of zig.ts.
  */
 export function gridlandWebPlugin(): Plugin[] {
   const pkgRoot = path.resolve(__dirname, "..")
   const _require = createRequire(path.resolve(pkgRoot, "package.json"))
   const _projectRequire = createRequire(path.resolve(process.cwd(), "package.json"))
-
-  // Pre-compiled core-shims for npm mode (no monorepo-relative paths)
-  const compiledCoreShims = path.resolve(pkgRoot, "dist/core-shims.js")
 
   // Resolve opentui package roots
   function resolvePackageRoot(pkg: string, fallbackRelative: string): string {
@@ -55,22 +55,21 @@ export function gridlandWebPlugin(): Plugin[] {
   // Detect whether opentui TypeScript source is available (monorepo/submodule)
   const hasSource = existsSync(path.resolve(reactRoot, "src/index.ts"))
 
-  const coreShims = path.resolve(pkgRoot, "src/core-shims/index.ts")
   const opentuiCoreBarrel = path.resolve(coreRoot, "src/index.ts")
   const sliderDeps = path.resolve(pkgRoot, "src/shims/slider-deps.ts")
   const sliderFile = path.resolve(coreRoot, "src/renderables/Slider.ts")
 
+  // File-level shims: replace native-backed opentui classes with browser implementations.
+  // Only needed for classes that delegate to RenderLib via pointer-based FFI calls.
+  // NOT needed for: zig (zig-registry.ts is browser-safe), renderer, console,
+  // NativeSpanFeed (no longer in browser barrel).
   const coreFileShims: Record<string, string> = {
-    zig: "src/shims/zig-stub.ts",
     buffer: "src/browser-buffer.ts",
     "text-buffer": "src/shims/text-buffer-shim.ts",
     "text-buffer-view": "src/shims/text-buffer-view-shim.ts",
     "syntax-style": "src/shims/syntax-style-shim.ts",
-    renderer: "src/shims/renderer-stub.ts",
-    console: "src/shims/console-stub.ts",
     "edit-buffer": "src/shims/edit-buffer-stub.ts",
     "editor-view": "src/shims/editor-view-stub.ts",
-    NativeSpanFeed: "src/shims/native-span-feed-stub.ts",
     "post/filters": "src/shims/filters-stub.ts",
     "animation/Timeline": "src/shims/timeline-stub.ts",
   }
@@ -115,10 +114,6 @@ export function gridlandWebPlugin(): Plugin[] {
       if (importer.startsWith(NPM_REDIRECT)) return null
 
       // ── Source mode only ──────────────────────────────────────────
-      // All @opentui/* interception, file-level shims, and node built-in
-      // stubs are only needed when processing opentui TypeScript source.
-      // In npm mode, @gridland/core is aliased to the pre-compiled
-      // core-shims bundle and no opentui packages are resolved directly.
       if (!hasSource) return null
 
       const isExternalOpentui =
@@ -142,10 +137,8 @@ export function gridlandWebPlugin(): Plugin[] {
         return path.resolve(reactRoot, "src/index.ts")
       }
       if (source === "@opentui/core") {
-        if (importer.startsWith(reactRoot + path.sep)) {
-          return opentuiCoreBarrel
-        }
-        return coreShims
+        // All consumers get the real barrel — it's browser-safe now.
+        return opentuiCoreBarrel
       }
 
       // @opentui/* subpath imports (e.g. @opentui/react/jsx-dev-runtime)
@@ -242,14 +235,10 @@ export function gridlandWebPlugin(): Plugin[] {
     config() {
       const aliases: Record<string, string> = {}
 
-      // In npm mode, alias @gridland/core to the pre-compiled core-shims bundle.
-      // @gridland/core bundles the real opentui (with native deps like bun:ffi),
-      // which browsers can't handle. The core-shims bundle has browser stubs.
-      if (!hasSource) {
-        aliases["@gridland/core"] = compiledCoreShims
-      }
+      // npm mode: @gridland/core resolves via package.json conditional exports
+      // ("import" → dist/browser.js). No alias needed.
 
-      // FFI shims
+      // FFI shims — still needed for lazy require("bun:ffi") in buffer.ts
       aliases["bun:ffi"] = path.resolve(pkgRoot, "src/shims/bun-ffi.ts")
       aliases["bun-ffi-structs"] = path.resolve(pkgRoot, "src/shims/bun-ffi-structs.ts")
       aliases["node:console"] = path.resolve(pkgRoot, "src/shims/console.ts")
