@@ -122,10 +122,72 @@ const sharedExternal = [
 async function main() {
   const shared = { bundle: true, format: "esm", platform: "neutral", target: "esnext", external: sharedExternal, sourcemap: true, banner: { js: requireShimBanner } }
 
-  await Promise.all([
-    esbuild.build({ ...shared, entryPoints: [path.resolve(pkgRoot, "src/index.ts")], outfile: path.resolve(pkgRoot, "dist/index.js"), plugins: [createBasePlugin()] }),
-    esbuild.build({ ...shared, entryPoints: [path.resolve(pkgRoot, "src/browser.ts")], outfile: path.resolve(pkgRoot, "dist/browser.js"), plugins: [createBasePlugin({ stubNative: true })] }),
-  ])
+  // Bun bundle: single file, no splitting needed (Bun handles circular deps)
+  await esbuild.build({ ...shared, entryPoints: [path.resolve(pkgRoot, "src/index.ts")], outfile: path.resolve(pkgRoot, "dist/index.js"), plugins: [createBasePlugin()] })
+
+  // Browser bundle: single-file bundle.
+  await esbuild.build({
+    ...shared,
+    entryPoints: [path.resolve(pkgRoot, "src/browser.ts")],
+    outfile: path.resolve(pkgRoot, "dist/browser.js"),
+    plugins: [createBasePlugin({ stubNative: true })],
+  })
+
+  // Post-process: fix circular dependency ordering.
+  // esbuild may place Renderable's class definition AFTER classes that extend it
+  // due to circular imports in the opentui source. We find the deferred Renderable
+  // section and hoist it before the first class that needs it.
+  const fs = await import("fs")
+  let code = fs.readFileSync(path.resolve(pkgRoot, "dist/browser.js"), "utf-8")
+  const lines = code.split("\n")
+
+  // Find the SECOND occurrence of the Renderable.ts section marker (the deferred part)
+  const marker = "// ../../opentui/packages/core/src/Renderable.ts"
+  let firstIdx = -1, secondIdx = -1
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === marker) {
+      if (firstIdx === -1) firstIdx = i
+      else { secondIdx = i; break }
+    }
+  }
+
+  if (secondIdx !== -1) {
+    // Find the end of the deferred section (next section marker or end of file)
+    let endIdx = lines.length
+    for (let i = secondIdx + 1; i < lines.length; i++) {
+      if (lines[i].trim().startsWith("// ../../opentui/packages/")) {
+        endIdx = i
+        break
+      }
+    }
+
+    // Extract the deferred section
+    const deferredSection = lines.splice(secondIdx, endIdx - secondIdx)
+
+    // Find the first "extends Renderable" or "extends BaseRenderable" class
+    let insertBefore = -1
+    for (let i = 0; i < lines.length; i++) {
+      if (/class\s.*extends\s+(Renderable3|BaseRenderable)\b/.test(lines[i])) {
+        insertBefore = i
+        break
+      }
+    }
+
+    if (insertBefore !== -1) {
+      // Find the section start (previous section marker) to insert cleanly
+      let sectionStart = insertBefore
+      for (let i = insertBefore - 1; i >= 0; i--) {
+        if (lines[i].trim().startsWith("// ../../opentui/packages/")) {
+          sectionStart = i
+          break
+        }
+      }
+
+      lines.splice(sectionStart, 0, ...deferredSection)
+      fs.writeFileSync(path.resolve(pkgRoot, "dist/browser.js"), lines.join("\n"))
+      console.log(`  Hoisted Renderable class definition (${deferredSection.length} lines) before first subclass`)
+    }
+  }
   console.log("✓ @gridland/core dist/index.js (bun) + dist/browser.js (browser)")
 }
 
