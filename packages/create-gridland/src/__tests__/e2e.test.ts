@@ -4,6 +4,7 @@ import fs from "node:fs"
 import net from "node:net"
 import path from "node:path"
 import os from "node:os"
+import { chromium, type Browser } from "@playwright/test"
 
 const CLI_PATH = path.resolve(__dirname, "../../dist/index.js")
 const MONOREPO_ROOT = path.resolve(__dirname, "../../../..")
@@ -151,8 +152,37 @@ function scaffoldAndInstall(projectName: string, framework: string) {
   runInProject(projectName, "bun install")
 }
 
+/**
+ * Load a URL in a headless browser and collect any console errors.
+ * Returns the list of error messages (empty = no errors).
+ */
+async function collectBrowserErrors(browser: Browser, url: string): Promise<string[]> {
+  const context = await browser.newContext()
+  const page = await context.newPage()
+  const errors: string[] = []
+
+  page.on("console", (msg) => {
+    if (msg.type() === "error") {
+      const text = msg.text()
+      // Ignore React DevTools suggestion and favicon 404
+      if (text.includes("Download the React DevTools")) return
+      if (text.includes("favicon.ico")) return
+      errors.push(text)
+    }
+  })
+  page.on("pageerror", (err) => {
+    errors.push(err.message)
+  })
+
+  await page.goto(url, { waitUntil: "networkidle" })
+  // Give async module init a moment to settle
+  await page.waitForTimeout(2000)
+  await context.close()
+  return errors
+}
+
 describe("e2e: vite dev server", () => {
-  it("starts and serves the page without errors", async () => {
+  it("loads without console errors", async () => {
     const port = await findFreePort()
     const projectName = "test-vite-dev"
     scaffoldAndInstall(projectName, "vite")
@@ -163,27 +193,22 @@ describe("e2e: vite dev server", () => {
       stdio: ["ignore", "pipe", "pipe"],
     })
 
-    let stderr = ""
-    child.stderr?.on("data", (chunk: Buffer) => { stderr += chunk.toString() })
-
+    const browser = await chromium.launch()
     try {
       const url = `http://localhost:${port}`
       await waitForServer(url)
 
-      const response = await fetch(url)
-      expect(response.ok).toBe(true)
-
-      const html = await response.text()
-      expect(html).toContain('<div id="root">')
-      expect(html).not.toContain("Internal Server Error")
+      const errors = await collectBrowserErrors(browser, url)
+      expect(errors).toEqual([])
     } finally {
+      await browser.close()
       child.kill("SIGTERM")
     }
   }, 90000)
 })
 
 describe("e2e: next dev server", () => {
-  it("starts and serves the page without errors", async () => {
+  it("loads without console errors", async () => {
     const port = await findFreePort()
     const projectName = "test-next-dev"
     scaffoldAndInstall(projectName, "next")
@@ -194,21 +219,15 @@ describe("e2e: next dev server", () => {
       stdio: ["ignore", "pipe", "pipe"],
     })
 
-    let stderr = ""
-    child.stderr?.on("data", (chunk: Buffer) => { stderr += chunk.toString() })
-
+    const browser = await chromium.launch()
     try {
       const url = `http://localhost:${port}`
       await waitForServer(url, 90000)
 
-      const response = await fetch(url)
-      expect(response.ok).toBe(true)
-
-      const html = await response.text()
-      expect(html).toContain("<html")
-      expect(html).not.toContain("Internal Server Error")
-      expect(html).not.toContain("Application error")
+      const errors = await collectBrowserErrors(browser, url)
+      expect(errors).toEqual([])
     } finally {
+      await browser.close()
       child.kill("SIGTERM")
     }
   }, 120000)

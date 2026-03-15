@@ -34,8 +34,11 @@ const browserFileShims = {
   "text-buffer": path.resolve(webRoot, "src/shims/text-buffer-shim.ts"),
   "text-buffer-view": path.resolve(webRoot, "src/shims/text-buffer-view-shim.ts"),
   "syntax-style": path.resolve(webRoot, "src/shims/syntax-style-shim.ts"),
+  "renderer": path.resolve(webRoot, "src/shims/renderer-stub.ts"),
+  "console": path.resolve(webRoot, "src/shims/console-stub.ts"),
   "edit-buffer": path.resolve(webRoot, "src/shims/edit-buffer-stub.ts"),
   "editor-view": path.resolve(webRoot, "src/shims/editor-view-stub.ts"),
+  "NativeSpanFeed": path.resolve(webRoot, "src/shims/native-span-feed-stub.ts"),
   "post/filters": path.resolve(webRoot, "src/shims/filters-stub.ts"),
   "animation/Timeline": path.resolve(webRoot, "src/shims/timeline-stub.ts"),
 }
