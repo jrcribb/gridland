@@ -14,13 +14,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "tsup && node build-core.mjs"
   },
   "dependencies": {
-    "@opentui/core": "^0.1.86",
-    "@opentui/react": "^0.1.86"
+    "react": "^19.0.0",
+    "react-reconciler": "0.33.0",
+    "yoga-layout": "^3.2.1"
   },
   "devDependencies": {
+    "esbuild": "^0.27.3",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0"
   },

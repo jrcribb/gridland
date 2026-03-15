@@ -64,6 +64,8 @@ export function gridlandWebPlugin(): Plugin[] {
   const hasSource = existsSync(path.resolve(reactRoot, "src/index.ts"))
 
   const coreShims = path.resolve(pkgRoot, "src/core-shims/index.ts")
+  // Pre-compiled core-shims for npm mode (no monorepo-relative paths)
+  const compiledCoreShims = path.resolve(pkgRoot, "dist/core-shims.js")
   const opentuiCoreBarrel = path.resolve(coreRoot, "src/index.ts")
   const sliderDeps = path.resolve(pkgRoot, "src/shims/slider-deps.ts")
   const sliderFile = path.resolve(coreRoot, "src/renderables/Slider.ts")
@@ -282,10 +284,14 @@ export function gridlandWebPlugin(): Plugin[] {
     config() {
       const aliases: Record<string, string> = {}
 
-      // @opentui/core → browser shims (prevents esbuild dep optimizer from
-      // trying to pre-bundle the real @opentui/core which uses unsupported
-      // import attributes like `with { type: "file" }`)
-      aliases["@opentui/core"] = coreShims
+      // In npm mode, alias @gridland/core to the pre-compiled core-shims bundle.
+      // @gridland/core bundles the real opentui (with native deps like bun:ffi),
+      // which browsers can't handle. The core-shims bundle has browser stubs instead.
+      // In source mode, the resolveId hook handles @opentui/core resolution
+      // and @gridland/core resolves normally from the workspace.
+      if (!hasSource) {
+        aliases["@gridland/core"] = compiledCoreShims
+      }
 
       // FFI shims
       aliases["bun:ffi"] = path.resolve(pkgRoot, "src/shims/bun-ffi.ts")

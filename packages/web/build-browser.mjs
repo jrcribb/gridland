@@ -54,6 +54,29 @@ async function main() {
     banner: { js: '"use client";\n' + requireShimBanner },
   })
   console.log("✓ dist/next.js")
+
+  // Build compiled core-shims for npm mode.
+  // End-user projects don't have the opentui submodule, so the Vite and
+  // Next.js plugins alias @opentui/core to this pre-compiled bundle
+  // instead of the raw core-shims/index.ts (which has monorepo-relative paths).
+  // Built from the REAL @opentui/core entry point with shims applied —
+  // this ensures all exports are included (not just the manual subset).
+  const coreShimsPlugin = createShimPlugin(pkgRoot)
+  await esbuild.build({
+    entryPoints: [path.resolve(pkgRoot, "src/core-shims-entry.ts")],
+    outfile: path.resolve(pkgRoot, "dist/core-shims.js"),
+    bundle: true,
+    format: "esm",
+    platform: "neutral",
+    target: "esnext",
+    mainFields: ["module", "browser", "main"],
+    conditions: ["import", "browser"],
+    external: ["react", "react-dom"],
+    plugins: [coreShimsPlugin],
+    sourcemap: true,
+    banner: { js: requireShimBanner },
+  })
+  console.log("✓ dist/core-shims.js")
 }
 
 main().catch((e) => {
