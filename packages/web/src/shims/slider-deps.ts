@@ -5,4 +5,4 @@
 export { Renderable, type RenderableOptions } from "../../../../opentui/packages/core/src/Renderable"
 export type { RenderContext } from "@gridland/utils"
 export { BrowserBuffer as OptimizedBuffer } from "../browser-buffer"
-export { RGBA, parseColor, type ColorInput } from "@gridland/utils"
+export { RGBA, parseColor, type ColorInput } from "../../../../opentui/packages/core/src/lib/RGBA"

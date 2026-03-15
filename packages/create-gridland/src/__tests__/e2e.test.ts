@@ -34,7 +34,15 @@ beforeAll(() => {
 })
 
 describe("tarball hygiene", () => {
-  it("no workspace:* in packed package.json files", () => {
+  // This test validates that published tarballs don't contain workspace:* deps
+  // (npm can't resolve them). It only runs when deps have been swapped to real
+  // versions (i.e., during the publish flow). In normal dev, workspace:* is
+  // expected and the test is skipped.
+  const webPkg = fs.readFileSync(path.resolve(MONOREPO_ROOT, "packages/web/package.json"), "utf-8")
+  const isPublishReady = !webPkg.includes('"workspace:')
+  const testFn = isPublishReady ? it : it.skip
+
+  testFn("no workspace:* in packed package.json files", () => {
     for (const [name, tarball] of Object.entries(tarballs)) {
       const extractDir = fs.mkdtempSync(path.join(os.tmpdir(), "tarball-check-"))
       execSync(`tar xzf ${tarball} -C ${extractDir}`, { timeout: 10000 })

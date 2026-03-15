@@ -79,6 +79,10 @@ const nextConfig: NextConfig = {
           resource.request = shimPath("src/shims/slider-deps.ts")
         }
       }),
+      // bun: scheme isn't handled by webpack — replace with shim for both server and client
+      new webpack.NormalModuleReplacementPlugin(/^bun:/, (resource: any) => {
+        resource.request = shimPath("src/shims/bun-ffi.ts")
+      }),
     )
 
     if (!isServer) {
@@ -100,9 +104,6 @@ const nextConfig: NextConfig = {
       config.plugins.push(
         new webpack.NormalModuleReplacementPlugin(/^node:/, (resource: any) => {
           resource.request = resource.request.replace(/^node:/, "")
-        }),
-        new webpack.NormalModuleReplacementPlugin(/^bun:/, (resource: any) => {
-          resource.request = resource.request.replace(/^bun:/, "")
         }),
       )
     }
