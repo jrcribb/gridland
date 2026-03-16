@@ -42,11 +42,14 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Install harness dependencies
-        run: bun install --cwd e2e/harness
-
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
+
+      - name: Build packages
+        run: bun run build
+
+      - name: Install harness dependencies
+        run: bun install --cwd e2e/harness
 
       - name: Run E2E tests
         run: bun run test:e2e
