@@ -1,6 +1,6 @@
 {
   "name": "@gridland/bun",
-  "version": "workspace:*",
+  "version": "0.2.46",
   "type": "module",
   "exports": {
     ".": {
