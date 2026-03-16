@@ -1,6 +1,6 @@
 {
   "name": "@gridland/bun",
-  "version": "0.2.39",
+  "version": "0.2.40",
   "type": "module",
   "exports": {
     ".": {
@@ -17,6 +17,12 @@
   "dependencies": {
     "@gridland/utils": "workspace:*",
     "react": "^19.0.0"
+  },
+  "optionalDependencies": {
+    "@opentui/core-darwin-x64": "0.1.86",
+    "@opentui/core-darwin-arm64": "0.1.86",
+    "@opentui/core-linux-x64": "0.1.86",
+    "@opentui/core-linux-arm64": "0.1.86"
   },
   "devDependencies": {
     "esbuild": "^0.27.3",
