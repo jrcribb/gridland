@@ -25,6 +25,9 @@ jobs:
       - name: Install opentui dependencies
         run: bun install --cwd opentui
 
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
       - name: Build packages
         run: bun run build
 
