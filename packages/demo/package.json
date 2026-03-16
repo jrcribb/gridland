@@ -21,8 +21,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@gridland/bun": "0.2.48",
-    "@gridland/utils": "0.2.48",
+    "@gridland/bun": "workspace:*",
+    "@gridland/utils": "workspace:*",
     "figlet": "^1.10.0",
     "react": "^19.0.0"
   },

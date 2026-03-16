@@ -15,7 +15,7 @@
     "build": "node build-bun.mjs"
   },
   "dependencies": {
-    "@gridland/utils": "0.2.48",
+    "@gridland/utils": "workspace:*",
     "react": "^19.0.0",
     "react-reconciler": "0.33.0",
     "yoga-layout": "^3.2.1"
