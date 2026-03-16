@@ -19,11 +19,13 @@ const opentuiRoot = path.resolve(pkgRoot, "../../opentui/packages")
 const requireShimBanner = [
   `import * as __REACT$ from "react";`,
   `var __EXT$ = { "react": __REACT$ };`,
-  `var require = globalThis.require || ((id) => {`,
+  `var __origRequire = typeof globalThis.require === "function" ? globalThis.require : null;`,
+  `var require = (id) => {`,
   `  var m = __EXT$[id];`,
   `  if (m) return m;`,
+  `  if (__origRequire) return __origRequire(id);`,
   `  throw new Error('Dynamic require of "' + id + '" is not supported');`,
-  `});`,
+  `};`,
   `if (typeof process === "undefined") var process = { env: {} };`,
 ].join(" ")
 
@@ -78,8 +80,15 @@ function createPlugin() {
         loader: "js",
       }))
 
-      // Stub bun:ffi, bun, bun-ffi-structs
-      build.onResolve({ filter: /^bun(:ffi)?$/ }, () => ({
+      // bun:ffi — keep as external so require("bun:ffi") resolves at runtime.
+      // In Bun, the real bun:ffi is available. In browsers, getFfi() is never
+      // called (BrowserBuffer is used instead of OptimizedBuffer.buffers).
+      build.onResolve({ filter: /^bun:ffi$/ }, () => ({
+        path: "bun:ffi",
+        external: true,
+      }))
+      // Stub bare "bun" import and bun-ffi-structs (not needed at runtime)
+      build.onResolve({ filter: /^bun$/ }, () => ({
         path: "bun-stub",
         namespace: "stub",
       }))
@@ -88,7 +97,7 @@ function createPlugin() {
         namespace: "stub",
       }))
       build.onLoad({ filter: /bun-(stub|ffi-structs-stub)/, namespace: "stub" }, () => ({
-        contents: "export default {}; export const ptr = () => 0; export const toBuffer = () => new Uint8Array(); export const CString = class {}; export const FFIType = {};",
+        contents: "export default {};",
         loader: "js",
       }))
 
@@ -147,7 +156,9 @@ async function main() {
     external: ["react", "react-dom"],
     plugins: [createPlugin()],
     banner: { js: requireShimBanner },
-    define: { "globalThis.Bun": "undefined" },
+    // Note: do NOT define globalThis.Bun as undefined here.
+    // OptimizedBuffer's getFfi() needs to detect Bun at runtime
+    // to use real bun:ffi for toArrayBuffer.
   })
 
   // Post-process: fix circular dependency ordering + remove duplicate Yoga WASM.

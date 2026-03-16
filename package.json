@@ -17,6 +17,7 @@
     "setup": "git submodule update --init && bun install && bun install --cwd opentui && bun run build"
   },
   "devDependencies": {
+    "@opentui/core-darwin-arm64": "0.1.86",
     "@playwright/test": "^1.49.0"
   }
 }

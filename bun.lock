@@ -5,6 +5,7 @@
     "": {
       "name": "polyterm-monorepo",
       "devDependencies": {
+        "@opentui/core-darwin-arm64": "0.1.86",
         "@playwright/test": "^1.49.0",
       },
     },
@@ -56,7 +57,7 @@
     },
     "packages/bun": {
       "name": "@gridland/bun",
-      "version": "0.3.0",
+      "version": "0.2.41",
       "dependencies": {
         "@gridland/utils": "workspace:*",
         "react": "^19.0.0",
@@ -65,6 +66,12 @@
         "esbuild": "^0.27.3",
         "tsup": "^8.4.0",
         "typescript": "^5.7.0",
+      },
+      "optionalDependencies": {
+        "@opentui/core-darwin-arm64": "0.1.86",
+        "@opentui/core-darwin-x64": "0.1.86",
+        "@opentui/core-linux-arm64": "0.1.86",
+        "@opentui/core-linux-x64": "0.1.86",
       },
       "peerDependencies": {
         "react": ">=19.0.0",
@@ -82,7 +89,7 @@
     },
     "packages/create-gridland": {
       "name": "create-gridland",
-      "version": "0.2.33",
+      "version": "0.2.41",
       "bin": {
         "create-gridland": "./dist/index.js",
       },
@@ -97,7 +104,7 @@
     },
     "packages/demo": {
       "name": "@gridland/demo",
-      "version": "0.3.0",
+      "version": "0.2.41",
       "bin": {
         "gridland-demo": "./bin/cli.mjs",
       },
@@ -140,7 +147,7 @@
     },
     "packages/testing": {
       "name": "@gridland/testing",
-      "version": "0.2.33",
+      "version": "0.2.41",
       "dependencies": {
         "@gridland/utils": "workspace:*",
         "events": "^3.3.0",
@@ -176,7 +183,7 @@
     },
     "packages/utils": {
       "name": "@gridland/utils",
-      "version": "0.3.0",
+      "version": "0.2.41",
       "dependencies": {
         "react": "^19.0.0",
         "react-reconciler": "0.33.0",
@@ -193,7 +200,7 @@
     },
     "packages/web": {
       "name": "@gridland/web",
-      "version": "0.2.33",
+      "version": "0.2.41",
       "dependencies": {
         "@gridland/utils": "workspace:*",
         "diff": "^8.0.3",
@@ -453,6 +460,14 @@
     "@openrouter/ai-sdk-provider": ["@openrouter/ai-sdk-provider@2.3.0", "", { "peerDependencies": { "ai": "^6.0.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-LXbXDDxCmEnXqvLH+37ZgoQzlmkmAPCbrUaTYhsuquTNVAu8BiwNHW7sEHcA3NOE49k50TRtLHce9JKcgKeoGA=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.0", "", {}, "sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg=="],
+
+    "@opentui/core-darwin-arm64": ["@opentui/core-darwin-arm64@0.1.86", "", { "os": "darwin", "cpu": "arm64" }, "sha512-Zp7q64+d+Dcx6YrH3mRcnHq8EOBnrfc1RvjgSWLhpXr49hY6LzuhqpfZM57aGErPYlR+ff8QM6e5FUkFnDfyjw=="],
+
+    "@opentui/core-darwin-x64": ["@opentui/core-darwin-x64@0.1.86", "", { "os": "darwin", "cpu": "x64" }, "sha512-NcxfjCJm1kLnTMVOpAPdRYNi8W8XdAXNa6N7i9khiVFrl2v5KRQfUjbrSOUYVxFJNc3jKFG6rsn3jEApvn92qA=="],
+
+    "@opentui/core-linux-arm64": ["@opentui/core-linux-arm64@0.1.86", "", { "os": "linux", "cpu": "arm64" }, "sha512-EDHAvqSOr8CXzbDvo1aE5blJ6wu1aSbR2LqoXtoeXHemr2T2W42D2TdIWewG6K+/BuRbzZnqt9wnYFBksLW6lw=="],
+
+    "@opentui/core-linux-x64": ["@opentui/core-linux-x64@0.1.86", "", { "os": "linux", "cpu": "x64" }, "sha512-VBaBkVdQDxYV4WcKjb+jgyMS5PiVHepvfaoKWpz1Bq+J01xXW4XPcXyPGkgR1+2R93KzaugEnLscTW4mWtLHlQ=="],
 
     "@orama/orama": ["@orama/orama@3.1.18", "", {}, "sha512-a61ljmRVVyG5MC/698C8/FfFDw5a8LOIvyOLW5fztgUXqUpc1jOfQzOitSCbge657OgXXThmY3Tk8fpiDb4UcA=="],
 

@@ -72,24 +72,23 @@ try {
     stdio: "pipe",
   })
 
-  // Smoke test: import @gridland/bun (will fail if native deps missing, but should at least parse)
-  console.log("Testing import @gridland/bun...")
+  // Smoke test: create a CLI renderer in testing mode (skips terminal setup which requires a TTY)
+  console.log("Testing @gridland/bun createCliRenderer (testing mode)...")
   try {
-    execSync(`bun -e 'import "@gridland/bun"'`, {
+    execSync(`bun -e 'const { createCliRenderer } = await import("@gridland/bun"); const r = await createCliRenderer({ exitOnCtrlC: true, testing: true }); r.destroy(); process.stderr.write("OK\\n");'`, {
       cwd: tmpDir,
       timeout: 10000,
       stdio: "pipe",
     })
   } catch (e) {
-    // Native FFI may fail in some envs — that's OK as long as the MODULE resolves
     const stderr = e.stderr?.toString() || ""
-    if (stderr.includes("Cannot find module") || stderr.includes("not found in module") || stderr.includes("Export named")) {
-      console.error(`✗ @gridland/bun import failed with module resolution error:`)
-      console.error(stderr.trim())
+    if (stderr.includes("OK")) {
+      // Renderer created and destroyed successfully
+    } else {
+      console.error(`✗ @gridland/bun createCliRenderer failed:`)
+      console.error(stderr.trim() || e.stdout?.toString().trim())
       process.exit(1)
     }
-    // Other errors (FFI, native lib) are OK — the package resolved correctly
-    console.log("  (native FFI not available in this env, but module resolved OK)")
   }
 
   console.log("✓ All smoke tests passed")
