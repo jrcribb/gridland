@@ -16,14 +16,18 @@ const pkgRoot = path.dirname(fileURLToPath(import.meta.url))
 const opentuiRoot = path.resolve(pkgRoot, "../../opentui/packages")
 
 // require() shim for CJS packages (react-reconciler) in ESM bundle.
+// Banner: shim require() for CJS deps (react-reconciler) and bun:ffi.
+// bun:ffi is external and must resolve at runtime via import().
+// In browsers, the lazy require("bun:ffi") in buffer.ts is never called
+// (BrowserBuffer is used), so the shim returning undefined is fine.
 const requireShimBanner = [
   `import * as __REACT$ from "react";`,
-  `var __EXT$ = { "react": __REACT$ };`,
-  `var __origRequire = typeof globalThis.require === "function" ? globalThis.require : null;`,
+  `var __BUNFFI$;`,
+  `try { __BUNFFI$ = await import("bun:ffi"); } catch {}`,
+  `var __EXT$ = { "react": __REACT$, "bun:ffi": __BUNFFI$ };`,
   `var require = (id) => {`,
   `  var m = __EXT$[id];`,
   `  if (m) return m;`,
-  `  if (__origRequire) return __origRequire(id);`,
   `  throw new Error('Dynamic require of "' + id + '" is not supported');`,
   `};`,
   `if (typeof process === "undefined") var process = { env: {} };`,
