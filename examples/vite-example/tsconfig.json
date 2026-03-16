@@ -9,9 +9,9 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "paths": {
-      "@opentui/core": ["../../packages/web/src/core-shims/index.ts"],
-      "@opentui/react": ["../../../../opentui/packages/react/src/index.ts"],
-      "@opentui/ui": ["../../../../opentui/packages/ui/src/index.ts"]
+      "@opentui/core": ["../../packages/core/src/index.ts"],
+      "@opentui/react": ["../../packages/core/src/react/index.ts"],
+      "@opentui/ui": ["../../packages/ui/components/index.ts"]
     }
   },
   "include": ["src", "gridland-jsx.d.ts"]

@@ -1,4 +1,4 @@
-// Stub for opentui tree-sitter module
+// Stub for tree-sitter module
 export function getTreeSitterClient(): any {
   return null
 }

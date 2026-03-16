@@ -1,4 +1,4 @@
-// Stub for opentui/packages/core/src/animation/Timeline.ts
+// Stub for packages/core/src/animation/Timeline.ts
 export class Timeline {
   public isPlaying: boolean = false
   public isComplete: boolean = false

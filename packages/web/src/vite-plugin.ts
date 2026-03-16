@@ -42,12 +42,11 @@ export function gridlandWebPlugin(): Plugin[] {
     }
     return path.resolve(pkgRoot, fallbackRelative)
   }
-  const coreRoot = resolvePackageRoot("@opentui/core", "../../opentui/packages/core")
-  const reactRoot = resolvePackageRoot("@opentui/react", "../../opentui/packages/react")
-  const uiRoot = resolvePackageRoot("@opentui/ui", "../../opentui/packages/ui")
+  const coreRoot = resolvePackageRoot("@opentui/core", "../../core")
+  const reactRoot = resolvePackageRoot("@opentui/react", "../../core")
 
-  // Detect whether opentui TypeScript source is available (monorepo/submodule)
-  const hasSource = existsSync(path.resolve(reactRoot, "src/index.ts"))
+  // Detect whether opentui TypeScript source is available (monorepo)
+  const hasSource = existsSync(path.resolve(coreRoot, "src/react/index.ts"))
 
   const opentuiCoreBarrel = path.resolve(coreRoot, "src/index.ts")
   const sliderDeps = path.resolve(pkgRoot, "src/shims/slider-deps.ts")
@@ -55,7 +54,7 @@ export function gridlandWebPlugin(): Plugin[] {
   const treeStub = path.resolve(pkgRoot, "src/shims/tree-sitter-stub.ts")
   const styledTextStub = path.resolve(pkgRoot, "src/shims/tree-sitter-styled-text-stub.ts")
 
-  const pkgRoots: Record<string, string> = { core: coreRoot, react: reactRoot, ui: uiRoot }
+  const pkgRoots: Record<string, string> = { core: coreRoot, react: coreRoot }
 
   // File-level shims: edit-buffer and editor-view call resolveRenderLib() at runtime.
   // Replace with pure-JS browser implementations.
@@ -90,11 +89,7 @@ export function gridlandWebPlugin(): Plugin[] {
 
       const isExternalOpentui =
         importer.startsWith(coreRoot + path.sep) ||
-        importer.startsWith(reactRoot + path.sep) ||
-        importer.startsWith(uiRoot + path.sep) ||
-        importer.includes("/@opentui/core/") ||
-        importer.includes("/@opentui/react/") ||
-        importer.includes("/@opentui/ui/")
+        importer.includes("/packages/core/")
 
       // Slider circular dep fix
       if (source === "../index" && importer === sliderFile) {
@@ -102,11 +97,8 @@ export function gridlandWebPlugin(): Plugin[] {
       }
 
       // Resolve @opentui packages
-      if (source === "@opentui/ui") {
-        return path.resolve(uiRoot, "src/index.ts")
-      }
       if (source === "@opentui/react") {
-        return path.resolve(reactRoot, "src/index.ts")
+        return path.resolve(coreRoot, "src/react/index.ts")
       }
       if (source === "@opentui/core") {
         return opentuiCoreBarrel

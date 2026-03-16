@@ -36,14 +36,14 @@ export interface RenderTuiOptions {
 // so require() fails — we use await import() here instead.
 const _webModule = await import("../../web/src/index")
 const _rendererModule = await import("../../web/src/browser-renderer")
-const _coreModule = await import("@gridland/utils").catch(() => {
+const _coreModule = await import("../../core/src/index").catch(() => {
   throw new Error(
-    "renderTui requires @opentui/core (RootRenderable). " +
-    "Make sure the opentui monorepo is available and module resolution is configured.",
+    "renderTui requires RootRenderable from packages/core. " +
+    "Make sure packages/core is available and module resolution is configured.",
   )
 })
 // Import reconciler to flush concurrent work synchronously in tests
-const _reconcilerModule = await import("../../../opentui/packages/react/src/reconciler/reconciler")
+const _reconcilerModule = await import("../../core/src/react/reconciler/reconciler")
 
 /**
  * Render a Gridland component for testing.

@@ -18,12 +18,10 @@ interface NextConfig {
  */
 export function withGridland(nextConfig: NextConfig = {}): NextConfig {
   const pkgRoot = path.resolve(__dirname, "..")
-  const opentuiRoot = path.resolve(pkgRoot, "../../opentui")
-  const coreRoot = path.resolve(opentuiRoot, "packages/core")
-  const reactRoot = path.resolve(opentuiRoot, "packages/react")
-  const uiRoot = path.resolve(opentuiRoot, "packages/ui")
+  const coreRoot = path.resolve(pkgRoot, "../../core")
+  const reactRoot = coreRoot
 
-  const hasSource = existsSync(path.resolve(reactRoot, "src/index.ts"))
+  const hasSource = existsSync(path.resolve(coreRoot, "src/react/index.ts"))
 
   function shimPath(p: string) {
     return path.resolve(pkgRoot, p)
@@ -49,8 +47,7 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
         ...(hasSource ? {
           "@opentui/core/native": shimPath("src/shims/native-stub.ts"),
           "@opentui/core": path.resolve(coreRoot, "src/index.ts"),
-          "@opentui/react": path.resolve(reactRoot, "src/index.ts"),
-          "@opentui/ui": path.resolve(uiRoot, "src/index.ts"),
+          "@opentui/react": path.resolve(coreRoot, "src/react/index.ts"),
           // File-level shims for modules that call resolveRenderLib()
           [path.resolve(coreRoot, "src/edit-buffer")]: shimPath("src/shims/edit-buffer-stub.ts"),
           [path.resolve(coreRoot, "src/editor-view")]: shimPath("src/shims/editor-view-stub.ts"),
@@ -77,7 +74,7 @@ export function withGridland(nextConfig: NextConfig = {}): NextConfig {
             shimPath("src/shims/tree-sitter-stub.ts"),
           [path.resolve(coreRoot, "src/lib/hast-styled-text")]:
             shimPath("src/shims/hast-stub.ts"),
-          [path.resolve(reactRoot, "src/reconciler/devtools-polyfill")]:
+          [path.resolve(coreRoot, "src/react/reconciler/devtools-polyfill")]:
             shimPath("src/shims/devtools-polyfill-stub.ts"),
         } : {}),
       }

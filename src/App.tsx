@@ -1,5 +1,5 @@
 import React from "react"
-import { MultiSelect } from "@opentui/ui"
+import { MultiSelect } from "@gridland/ui"
 
 export function App() {
   return (

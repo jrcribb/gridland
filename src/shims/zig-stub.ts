@@ -1,4 +1,4 @@
-// Stub for opentui/packages/core/src/zig.ts
+// Stub for packages/core/src/zig.ts
 // Provides no-op RenderLib and resolveRenderLib
 
 export type Pointer = number

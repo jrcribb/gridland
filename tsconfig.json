@@ -16,10 +16,9 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@opentui/core": ["./src/core-shims/index.ts"],
-      "@opentui/core/*": ["./src/core-shims/*"],
-      "@opentui/react": ["../opentui/packages/react/src/index.ts"],
-      "@opentui/ui": ["../opentui/packages/ui/src/index.ts"]
+      "@opentui/core": ["./packages/core/src/index.ts"],
+      "@opentui/core/*": ["./packages/core/src/*"],
+      "@opentui/react": ["./packages/core/src/react/index.ts"]
     },
     "baseUrl": "."
   },

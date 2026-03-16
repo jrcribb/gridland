@@ -17,9 +17,9 @@
     "sourceMap": true,
     "paths": {
       "@gridland/utils": ["../utils/src/index.ts"],
-      "@opentui/core": ["../../opentui/packages/core/src/index.ts"],
-      "@opentui/core/*": ["../../opentui/packages/core/src/*"],
-      "@opentui/react": ["../../opentui/packages/react/src/index.ts"]
+      "@opentui/core": ["../core/src/index.ts"],
+      "@opentui/core/*": ["../core/src/*"],
+      "@opentui/react": ["../core/src/react/index.ts"]
     },
     "baseUrl": "."
   },

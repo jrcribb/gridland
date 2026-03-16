@@ -2,7 +2,7 @@ import { BrowserBuffer } from "./browser-buffer"
 import { BrowserRenderContext } from "./browser-render-context"
 import { CanvasPainter, type CursorOverlay } from "./canvas-painter"
 import { SelectionManager } from "./selection-manager"
-import { getLinkId } from "@gridland/utils"
+import { getLinkId } from "../../core/src/utils"
 import { executeRenderPipeline } from "./render-pipeline"
 
 // RootRenderable is set externally to avoid circular deps

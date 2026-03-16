@@ -1,4 +1,4 @@
-// Stub for opentui/packages/core/src/console.ts
+// Stub for packages/core/src/console.ts
 export class TerminalConsole {
   constructor(..._args: any[]) {}
 }

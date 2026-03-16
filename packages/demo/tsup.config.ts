@@ -6,13 +6,15 @@ const sharedAlias = {
 }
 
 export default defineConfig([
-  // CLI entry — externalizes opentui (installed as runtime deps)
+  // CLI entry — externalizes opentui (installed as runtime deps).
+  // @opentui/* must be externalized to @gridland/bun to avoid duplicate
+  // reconciler/yoga instances which cause native FFI segfaults.
   {
     entry: { run: "src/run.tsx" },
     format: ["esm"],
     dts: false,
     sourcemap: false,
-    external: ["react", "@gridland/bun", "figlet"],
+    external: ["react", "@gridland/bun", "@gridland/utils", "figlet"],
     target: "esnext",
     esbuildOptions(options) {
       options.alias = sharedAlias

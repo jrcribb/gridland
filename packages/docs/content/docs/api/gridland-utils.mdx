@@ -28,41 +28,9 @@ import { useTerminalDimensions } from "@gridland/utils"
 
 ## Headless Rendering
 
-For scripts, tests, or build-time rendering. See [SSR for Agents](/docs/guides/ssr-for-agents).
-
-```tsx title="Import"
-import {
-  HeadlessRenderer,
-  setHeadlessRootRenderableClass,
-  createHeadlessRoot,
-  bufferToText,
-} from "@gridland/utils"
-```
-
-### `HeadlessRenderer`
-
-Manages a virtual buffer and render context for headless rendering.
-
-| Method | Description |
-|--------|-------------|
-| `new HeadlessRenderer({ cols, rows })` | Create with virtual terminal size |
-| `renderOnce()` | Execute one render pass |
-| `toText()` | Extract text from the buffer |
-| `resize(cols, rows)` | Resize the virtual terminal |
-
-### `createHeadlessRoot(renderer)`
-
-Creates a React root for headless rendering.
-
-| Method | Description |
-|--------|-------------|
-| `render(element)` | Render a React element |
-| `renderToText(element)` | Render and extract text in one call |
-| `unmount()` | Clean up |
-
-### `bufferToText(buffer)`
-
-Converts a `ReadableCharBuffer` to a plain text string.
+Headless rendering APIs live in `@gridland/web`, not `@gridland/utils`.
+See [SSR for Agents](/docs/guides/ssr-for-agents) and the
+[@gridland/web API reference](/docs/api/gridland-web) for details.
 
 ## Utilities
 

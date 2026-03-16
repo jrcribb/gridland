@@ -1,4 +1,4 @@
-// Stub for opentui/packages/core/src/renderer.ts
+// Stub for packages/core/src/renderer.ts
 import { EventEmitter } from "events"
 
 export enum CliRenderEvents {

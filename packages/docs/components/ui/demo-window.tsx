@@ -9,7 +9,7 @@ import {
   createHeadlessRoot,
 } from "@gridland/web"
 import { ThemeProvider, darkTheme, lightTheme } from "@gridland/ui"
-import { RootRenderable } from "@gridland/utils"
+import { RootRenderable } from "../../../core/src/Renderable"
 import { TerminalWindow } from "@/components/ui/mac-window"
 
 // One-time global setup

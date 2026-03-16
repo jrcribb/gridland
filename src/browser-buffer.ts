@@ -2,7 +2,7 @@ import type { RGBA } from "./core-shims/rgba"
 import type { CapturedLine, CapturedSpan } from "./core-shims/types"
 import { attributesWithLink } from "./core-shims/index"
 
-// Attribute flags matching TextAttributes from opentui core
+// Attribute flags matching TextAttributes from gridland core
 const CONTINUATION = 0xc0000000
 
 interface ScissorRect {
@@ -681,5 +681,5 @@ export class BrowserBuffer {
   destroy(): void {}
 }
 
-// Export as OptimizedBuffer so opentui source code imports work directly
+// Export as OptimizedBuffer so core source code imports work directly
 export { BrowserBuffer as OptimizedBuffer }

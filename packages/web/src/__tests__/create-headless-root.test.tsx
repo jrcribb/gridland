@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "bun:test"
 import React from "react"
 import { HeadlessRenderer, setHeadlessRootRenderableClass } from "../headless-renderer"
 import { createHeadlessRoot } from "../create-headless-root"
-import { RootRenderable } from "@gridland/utils"
+import { RootRenderable } from "../../../core/src/Renderable"
 
 describe("createHeadlessRoot", () => {
   beforeEach(() => {

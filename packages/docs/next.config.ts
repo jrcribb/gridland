@@ -4,7 +4,7 @@ import path from "path"
 
 const withMDX = createMDX()
 
-const opentui = path.resolve(__dirname, "../../opentui")
+const coreRoot = path.resolve(__dirname, "../core")
 const pkgRoot = path.resolve(__dirname, "../web")
 
 function shimPath(p: string) {
@@ -22,15 +22,19 @@ const nextConfig: NextConfig = {
   webpack: (config, { isServer, webpack }) => {
     const sharedAliases: Record<string, string> = {
       // @opentui packages — source mode
-      "@opentui/core$": path.resolve(opentui, "packages/core/src/index.ts"),
+      "@opentui/core$": path.resolve(coreRoot, "src/index.ts"),
       "@opentui/core/native": shimPath("src/shims/native-stub.ts"),
-      "@opentui/react": path.resolve(opentui, "packages/react/src/index.ts"),
+      "@opentui/react": path.resolve(coreRoot, "src/react/index.ts"),
       // Convenience aliases
       "opentui-web": path.resolve(pkgRoot, "src/index.ts"),
       "@gridland/utils": path.resolve(__dirname, "../utils/src/index.ts"),
       "@gridland/web": path.resolve(pkgRoot, "src/index.ts"),
       "opentui-ui": path.resolve(__dirname, "../ui/components/index.ts"),
       "@gridland/ui": path.resolve(__dirname, "../ui/components/index.ts"),
+
+      // react-reconciler — resolve from web's dependency tree
+      "react-reconciler": path.resolve(pkgRoot, "node_modules/react-reconciler"),
+      "react-reconciler/constants": path.resolve(pkgRoot, "node_modules/react-reconciler/constants.js"),
 
       // FFI shims
       "bun:ffi": shimPath("src/shims/bun-ffi.ts"),
@@ -41,27 +45,32 @@ const nextConfig: NextConfig = {
       "tree-sitter-styled-text": shimPath("src/shims/tree-sitter-styled-text-stub.ts"),
       "web-tree-sitter": shimPath("src/shims/tree-sitter-stub.ts"),
       "hast-styled-text": shimPath("src/shims/hast-stub.ts"),
-      [path.resolve(opentui, "packages/core/src/lib/tree-sitter-styled-text")]:
+      [path.resolve(coreRoot, "src/lib/tree-sitter-styled-text")]:
         shimPath("src/shims/tree-sitter-styled-text-stub.ts"),
-      [path.resolve(opentui, "packages/core/src/lib/tree-sitter")]:
+      [path.resolve(coreRoot, "src/lib/tree-sitter")]:
         shimPath("src/shims/tree-sitter-stub.ts"),
-      [path.resolve(opentui, "packages/core/src/lib/hast-styled-text")]:
+      [path.resolve(coreRoot, "src/lib/hast-styled-text")]:
         shimPath("src/shims/hast-stub.ts"),
 
       // Devtools polyfill stub
-      [path.resolve(opentui, "packages/react/src/reconciler/devtools-polyfill")]:
+      "react-devtools-core": shimPath("src/shims/devtools-polyfill-stub.ts"),
+      [path.resolve(coreRoot, "src/react/reconciler/devtools-polyfill")]:
+        shimPath("src/shims/devtools-polyfill-stub.ts"),
+
+      // Devtools import in reconciler.ts (dynamic, but webpack resolves it)
+      [path.resolve(coreRoot, "src/react/reconciler/devtools")]:
         shimPath("src/shims/devtools-polyfill-stub.ts"),
 
       // File-level shims for modules that call resolveRenderLib()
-      [path.resolve(opentui, "packages/core/src/edit-buffer")]:
+      [path.resolve(coreRoot, "src/edit-buffer")]:
         shimPath("src/shims/edit-buffer-stub.ts"),
-      [path.resolve(opentui, "packages/core/src/editor-view")]:
+      [path.resolve(coreRoot, "src/editor-view")]:
         shimPath("src/shims/editor-view-stub.ts"),
-      [path.resolve(opentui, "packages/core/src/text-buffer")]:
+      [path.resolve(coreRoot, "src/text-buffer")]:
         shimPath("src/shims/text-buffer-shim.ts"),
-      [path.resolve(opentui, "packages/core/src/text-buffer-view")]:
+      [path.resolve(coreRoot, "src/text-buffer-view")]:
         shimPath("src/shims/text-buffer-view-shim.ts"),
-      [path.resolve(opentui, "packages/core/src/syntax-style")]:
+      [path.resolve(coreRoot, "src/syntax-style")]:
         shimPath("src/shims/syntax-style-shim.ts"),
     }
 
@@ -72,7 +81,7 @@ const nextConfig: NextConfig = {
     }
 
     // Slider circular dependency fix
-    const renderablesDir = path.resolve(opentui, "packages/core/src/renderables")
+    const renderablesDir = path.resolve(coreRoot, "src/renderables")
     config.plugins.push(
       new webpack.NormalModuleReplacementPlugin(/^\.\.\/index$/, (resource: any) => {
         if (resource.context === renderablesDir) {
@@ -99,6 +108,7 @@ const nextConfig: NextConfig = {
         ...(config.resolve.modules || []),
         path.resolve(pkgRoot, "node_modules"),
         path.resolve(pkgRoot, "../../node_modules"),
+        path.resolve(__dirname, "../../node_modules"),
       ]
 
       config.plugins.push(

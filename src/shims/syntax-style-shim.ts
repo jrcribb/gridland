@@ -1,7 +1,7 @@
 // Shim that re-exports BrowserSyntaxStyle as SyntaxStyle
 export { BrowserSyntaxStyle as SyntaxStyle } from "../browser-syntax-style"
 
-// Types that opentui imports from syntax-style
+// Types that core imports from syntax-style
 export interface StyleDefinition {
   fg?: any
   bg?: any

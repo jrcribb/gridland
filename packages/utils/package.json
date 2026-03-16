@@ -12,14 +12,13 @@
   "types": "./dist/index.d.ts",
   "files": ["dist"],
   "scripts": {
-    "build": "tsup && node build-utils.mjs"
+    "build": "node build-utils.mjs && cp src/index.d.ts dist/index.d.ts"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-reconciler": "0.33.0",
-    "yoga-layout": "^3.2.1"
+    "react": "^19.0.0"
   },
   "devDependencies": {
+    "@types/react": "^19.2.14",
     "esbuild": "^0.27.3",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0"

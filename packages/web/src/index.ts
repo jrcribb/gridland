@@ -47,7 +47,7 @@ export { useBrowserContext } from "./browser-context"
 
 // Gridland extension: textAlign property on TextBufferRenderable.
 // Proxies to the BrowserTextBufferView's textAlign property for centered text rendering.
-import { TextBufferRenderable } from "@gridland/utils"
+import { TextBufferRenderable } from "../../core/src/renderables"
 Object.defineProperty(TextBufferRenderable.prototype, "textAlign", {
   get(this: any) {
     return this.textBufferView?.textAlign ?? "left"

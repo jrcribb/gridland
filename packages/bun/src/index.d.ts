@@ -1,8 +1,12 @@
 // @gridland/bun type declarations.
-// Re-exports everything from @gridland/utils plus native-only exports.
-// Native types are declared here since @opentui/core/native isn't available to npm consumers.
+// Re-exports everything from @gridland/utils (hooks/types) plus engine + native exports.
 
 export * from "@gridland/utils"
+
+// Engine types re-exported from core (bundled monolithically in dist/index.js)
+// These are too numerous to enumerate — consumers get them from the JS bundle.
+// Key engine exports include: Renderable, renderables, buffer types, zig-registry,
+// reconciler (createRoot, _render, reconciler), component catalogue, Yoga, etc.
 
 // Native-only exports — types inlined to avoid dependency on @opentui/core/native
 export declare class CliRenderer {

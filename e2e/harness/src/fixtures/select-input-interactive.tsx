@@ -1,6 +1,6 @@
 // @ts-nocheck — OpenTUI intrinsic elements conflict with React's HTML/SVG types
 import { useState } from "react"
-import { useKeyboard } from "@opentui/react"
+import { useKeyboard } from "@gridland/utils"
 import { FixtureWrapper } from "../fixture-wrapper"
 import { SelectInput } from "../../../../packages/ui/components/select-input/select-input"
 

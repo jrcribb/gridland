@@ -66,20 +66,20 @@ plugin({
       contents: string
     }> = [
       {
-        filter: /opentui\/packages\/core\/src\/text-buffer\.ts$/,
+        filter: /core\/src\/text-buffer\.ts$/,
         contents: `
           export { BrowserTextBuffer as TextBuffer } from "${path.resolve(srcDir, "browser-text-buffer.ts")}"
           export type { TextChunk, StyledTextInput } from "${path.resolve(srcDir, "browser-text-buffer.ts")}"
         `,
       },
       {
-        filter: /opentui\/packages\/core\/src\/text-buffer-view\.ts$/,
+        filter: /core\/src\/text-buffer-view\.ts$/,
         contents: `
           export { BrowserTextBufferView as TextBufferView } from "${path.resolve(srcDir, "browser-text-buffer-view.ts")}"
         `,
       },
       {
-        filter: /opentui\/packages\/core\/src\/syntax-style\.ts$/,
+        filter: /core\/src\/syntax-style\.ts$/,
         contents: `
           export { BrowserSyntaxStyle as SyntaxStyle } from "${path.resolve(srcDir, "browser-syntax-style.ts")}"
           export interface StyleDefinition { fg?: any; bg?: any; attributes?: number; [key: string]: any }
@@ -89,7 +89,7 @@ plugin({
         `,
       },
       {
-        filter: /opentui\/packages\/core\/src\/zig\.ts$/,
+        filter: /core\/src\/zig\.ts$/,
         contents: `
           export type Pointer = number
           export interface LineInfo {
@@ -103,7 +103,7 @@ plugin({
         `,
       },
       {
-        filter: /opentui\/packages\/core\/src\/buffer\.ts$/,
+        filter: /core\/src\/buffer\.ts$/,
         contents: `
           export { BrowserBuffer as OptimizedBuffer } from "${path.resolve(srcDir, "browser-buffer.ts")}"
         `,
@@ -118,8 +118,8 @@ plugin({
     // Bun resolves workspace packages before plugins, so onResolve can't
     // intercept @gridland/utils. Instead, intercept the loaded dist/index.js
     // and replace it with re-exports from the source tree.
-    const opentuiCoreSrc = path.resolve(pkgRoot, "../../opentui/packages/core/src/index.ts")
-    const opentuiReactSrc = path.resolve(pkgRoot, "../../opentui/packages/react/src/index.ts")
+    const opentuiCoreSrc = path.resolve(pkgRoot, "../core/src/index.ts")
+    const opentuiReactSrc = path.resolve(pkgRoot, "../core/src/react/index.ts")
     build.onLoad({ filter: /packages\/utils\/dist\/index\.js$/ }, () => ({
       contents: `export * from "${opentuiCoreSrc}"; export * from "${opentuiReactSrc}";`,
       loader: "ts",
@@ -133,11 +133,16 @@ plugin({
     build.onResolve({ filter: /^react$/ }, () => ({ path: reactPath }))
     const yogaPath = import.meta.resolveSync("yoga-layout")
     build.onResolve({ filter: /^yoga-layout$/ }, () => ({ path: yogaPath }))
+    // Resolve react-reconciler from web's node_modules (core/src can't find it)
+    build.onResolve({ filter: /^react-reconciler/ }, (args) => {
+      const resolved = import.meta.resolveSync(args.path)
+      return { path: resolved }
+    })
 
     // Intercept reconciler.ts to use our pre-loaded patched reconciler factory
     // and constants from globalThis. This avoids loading react-reconciler from
     // rebalance-opentui (which would bring in a second React copy).
-    build.onLoad({ filter: /opentui\/packages\/react\/src\/reconciler\/reconciler\.ts$/ }, (args) => {
+    build.onLoad({ filter: /core\/src\/react\/reconciler\/reconciler\.ts$/ }, (args) => {
       const source = fs.readFileSync(args.path, "utf8")
       const patched = source
         .replace(

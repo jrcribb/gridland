@@ -1,8 +1,9 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { execSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { tmpdir } from "node:os";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const AVAILABLE_DEMOS = JSON.parse(
@@ -44,7 +45,11 @@ if (!hasBun) {
 }
 
 const runPath = join(__dirname, "../dist/run.js");
-const { status } = spawnSync("bun", ["-e", `import("${runPath}").then(m => m.runDemo("${name}"))`], {
+const tmpDir = mkdtempSync(join(tmpdir(), "gridland-demo-"));
+const scriptPath = join(tmpDir, "run.mjs");
+writeFileSync(scriptPath, `import { runDemo } from "${runPath}";\nrunDemo("${name}");\n`);
+const { status } = spawnSync("bun", [scriptPath], {
   stdio: "inherit",
 });
+rmSync(tmpDir, { recursive: true, force: true });
 process.exit(status ?? 1);

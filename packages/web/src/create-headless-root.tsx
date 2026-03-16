@@ -2,7 +2,9 @@ import React, { type ReactNode } from "react"
 import type { HeadlessRenderer } from "./headless-renderer"
 import { BrowserContext } from "./browser-context"
 
-import { _render, reconciler, AppContext, ErrorBoundary as _ErrorBoundary } from "@gridland/utils"
+import { _render, reconciler } from "../../core/src/react/reconciler/reconciler"
+import { AppContext } from "../../core/src/react/components/app"
+import { ErrorBoundary as _ErrorBoundary } from "../../core/src/react/components/error-boundary"
 
 const ErrorBoundary = _ErrorBoundary as unknown as React.ComponentType<{ children: React.ReactNode }>
 
@@ -45,7 +47,7 @@ export function createHeadlessRoot(renderer: HeadlessRenderer): HeadlessRoot {
     unmount() {
       if (container) {
         reconciler.updateContainer(null, container, null, () => {})
-        // @ts-expect-error the types for `react-reconciler` are not up to date with the library.
+        // @ts-ignore the types for `react-reconciler` are not up to date with the library.
         reconciler.flushSyncWork()
         container = null
       }

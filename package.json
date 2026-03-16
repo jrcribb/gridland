@@ -14,10 +14,14 @@
     "docs:build": "bun run --cwd packages/docs build",
     "dev:next": "bun run --cwd examples/next-example dev",
     "clean": "rm -rf packages/*/dist packages/*/node_modules node_modules",
-    "setup": "git submodule update --init && bun install && bun install --cwd opentui && bun run build"
+    "setup": "bun install && bun run build"
   },
   "devDependencies": {
-    "@opentui/core-darwin-arm64": "0.1.86",
-    "@playwright/test": "^1.49.0"
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14"
+  },
+  "dependencies": {
+    "react-reconciler": "0.33.0"
   }
 }

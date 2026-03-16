@@ -1,6 +1,6 @@
 import type { RGBA } from "@gridland/utils"
 import type { CapturedLine, CapturedSpan, CursorStyle } from "@gridland/utils"
-import { attributesWithLink } from "@gridland/utils"
+import { attributesWithLink } from "../../core/src/utils"
 
 // Attribute flags matching TextAttributes from opentui core
 const CONTINUATION = 0xc0000000

@@ -16,7 +16,9 @@
   },
   "dependencies": {
     "@gridland/utils": "workspace:*",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-reconciler": "0.33.0",
+    "yoga-layout": "^3.2.1"
   },
   "optionalDependencies": {
     "@opentui/core-darwin-x64": "0.1.86",

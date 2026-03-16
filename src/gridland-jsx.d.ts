@@ -1,4 +1,4 @@
-// JSX intrinsic elements for Gridland (built on the opentui engine)
+// JSX intrinsic elements for Gridland
 // These map to the component catalogue in the reconciler
 
 import type { RGBA } from "./core-shims/rgba"

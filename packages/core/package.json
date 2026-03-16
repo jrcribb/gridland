@@ -1,0 +1,15 @@
+{
+  "name": "@gridland/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "yoga-layout": "^3.2.1",
+    "marked": "^15.0.0",
+    "diff": "^7.0.0",
+    "bun-ffi-structs": "^0.1.0"
+  },
+  "peerDependencies": {
+    "react": ">=19.0.0"
+  }
+}

@@ -1,5 +1,5 @@
 import { BrowserRenderer, setRootRenderableClass } from "./browser-renderer"
-import { RootRenderable } from "@opentui/core"
+import { RootRenderable } from "@gridland/core"
 import { createBrowserRoot } from "./create-browser-root"
 import { App } from "./App"
 

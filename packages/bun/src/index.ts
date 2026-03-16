@@ -1,19 +1,20 @@
-// @gridland/bun — full Bun runtime. Re-exports @gridland/utils + native code.
-// For CLI/terminal apps running on Bun with native FFI.
+// @gridland/bun — full Bun runtime. Monolithic engine + native FFI in one file.
+// No engine code crosses package boundaries — prevents segfaults from bun:ffi
+// pointers crossing npm package scopes.
 
-// Re-export everything from utils (hooks, types, renderables, reconciler)
-export * from "@gridland/utils"
+// Full engine (bundled monolithically from core source)
+export * from "../../core/src/index"
 
-// Side-effect: import zig.ts which calls registerRenderLib() with native FFI
-import "../../../opentui/packages/core/src/zig"
+// React reconciler + hooks + components (bundled monolithically)
+// Hooks/AppContext use globalThis singletons for sharing with @gridland/utils.
+export * from "../../core/src/react"
 
-// Native-only exports
-export { CliRenderer, CliRenderEvents, createCliRenderer } from "../../../opentui/packages/core/src/renderer"
-export type { MouseEvent } from "../../../opentui/packages/core/src/renderer"
-export { TerminalConsole, ConsolePosition, capture } from "../../../opentui/packages/core/src/console"
-export { NativeSpanFeed } from "../../../opentui/packages/core/src/NativeSpanFeed"
-export { setRenderLibPath } from "../../../opentui/packages/core/src/zig"
+// Side-effect: register native FFI via zig bindings
+import "../../core/src/zig"
 
-// Override createRoot from @gridland/utils — the utils version has CliRenderEvents
-// stubbed to null. This version uses the real native CliRenderEvents.
-export { createRoot } from "../../../opentui/packages/react/src/reconciler/renderer"
+// Native-only exports (not in core/index.ts because they're not browser-safe)
+export { CliRenderer, CliRenderEvents, createCliRenderer } from "../../core/src/renderer"
+export type { MouseEvent } from "../../core/src/renderer"
+export { TerminalConsole, ConsolePosition, capture } from "../../core/src/console"
+export { NativeSpanFeed } from "../../core/src/NativeSpanFeed"
+export { setRenderLibPath } from "../../core/src/zig"

@@ -10,7 +10,6 @@ export default defineConfig({
   external: [
     "react", "react-dom",
     "@gridland/utils",
-    /^@opentui\//,
     /^bun/,
     "events",
     "fs", "fs/promises", "path", "os", "stream", "url", "util",
