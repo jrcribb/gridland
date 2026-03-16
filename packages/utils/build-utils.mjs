@@ -15,19 +15,18 @@ import { fileURLToPath } from "url"
 const pkgRoot = path.dirname(fileURLToPath(import.meta.url))
 const opentuiRoot = path.resolve(pkgRoot, "../../opentui/packages")
 
-// require() shim for CJS packages (react-reconciler) in ESM bundle.
-// Banner: shim require() for CJS deps (react-reconciler) and bun:ffi.
-// bun:ffi is external and must resolve at runtime via import().
-// In browsers, the lazy require("bun:ffi") in buffer.ts is never called
-// (BrowserBuffer is used), so the shim returning undefined is fine.
+// require() shim for CJS packages (react-reconciler) and bun:ffi.
+// bun:ffi is resolved lazily on first require("bun:ffi") call — no top-level
+// await, which would make this an async module and change initialization timing.
+// In Bun, Bun.plugin provides a synchronous way to intercept require().
+// require() shim: resolves "react" (CJS dep of react-reconciler) and "bun:ffi"
+// (lazy FFI access in OptimizedBuffer). No top-level await — synchronous only.
 const requireShimBanner = [
   `import * as __REACT$ from "react";`,
-  `var __BUNFFI$;`,
-  `try { __BUNFFI$ = await import("bun:ffi"); } catch {}`,
-  `var __EXT$ = { "react": __REACT$, "bun:ffi": __BUNFFI$ };`,
+  `var __EXT$ = { "react": __REACT$ };`,
   `var require = (id) => {`,
-  `  var m = __EXT$[id];`,
-  `  if (m) return m;`,
+  `  if (__EXT$[id]) return __EXT$[id];`,
+  `  if (id === "bun:ffi" && typeof Bun !== "undefined") return (__EXT$[id] = Bun.FFI);`,
   `  throw new Error('Dynamic require of "' + id + '" is not supported');`,
   `};`,
   `if (typeof process === "undefined") var process = { env: {} };`,
