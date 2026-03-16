@@ -13,3 +13,7 @@ export type { MouseEvent } from "../../../opentui/packages/core/src/renderer"
 export { TerminalConsole, ConsolePosition, capture } from "../../../opentui/packages/core/src/console"
 export { NativeSpanFeed } from "../../../opentui/packages/core/src/NativeSpanFeed"
 export { setRenderLibPath } from "../../../opentui/packages/core/src/zig"
+
+// Override createRoot from @gridland/utils — the utils version has CliRenderEvents
+// stubbed to null. This version uses the real native CliRenderEvents.
+export { createRoot } from "../../../opentui/packages/react/src/reconciler/renderer"

@@ -47,12 +47,20 @@ const nativeFiles = new Set([
   "lib/terminal-capability-detection.ts",
 ].map(f => path.resolve(coreSrc, f)))
 
+// Also bundle the React reconciler renderer (createRoot) — it depends on native CliRenderEvents
+const reactSrc = path.resolve(opentuiRoot, "react/src")
+const reactNativeFiles = new Set([
+  "reconciler/renderer.ts",
+].map(f => path.resolve(reactSrc, f)))
+const reactNativeFilesNoExt = new Set([...reactNativeFiles].map(f => f.replace(/\.ts$/, "")))
+
 // Build a second Set without .ts extensions for extensionless lookups
 const nativeFilesNoExt = new Set([...nativeFiles].map(f => f.replace(/\.ts$/, "")))
 
 function isNativeFile(filePath) {
   const normalized = path.resolve(filePath)
-  return nativeFiles.has(normalized) || nativeFilesNoExt.has(normalized)
+  return nativeFiles.has(normalized) || nativeFilesNoExt.has(normalized) ||
+    reactNativeFiles.has(normalized) || reactNativeFilesNoExt.has(normalized)
 }
 
 function createPlugin() {
@@ -82,10 +90,13 @@ function createPlugin() {
         path: path.resolve(opentuiRoot, "core/src/native.ts"),
       }))
 
-      // Relative imports from within opentui/core/src:
+      // Relative imports from within opentui/core/src or opentui/packages/react/src:
       // If the resolved file is NOT a native file, externalize to @gridland/utils
       build.onResolve({ filter: /^\./ }, (args) => {
-        if (!args.resolveDir || !args.resolveDir.includes("opentui/packages/core/src")) return null
+        if (!args.resolveDir) return null
+        const inCore = args.resolveDir.includes("opentui/packages/core/src")
+        const inReact = args.resolveDir.includes("opentui/packages/react/src")
+        if (!inCore && !inReact) return null
 
         const resolved = path.resolve(args.resolveDir, args.path)
         const candidates = [resolved, resolved + ".ts", resolved + "/index.ts"]
