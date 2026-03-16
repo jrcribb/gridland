@@ -1,6 +1,6 @@
 {
   "name": "@gridland/testing",
-  "version": "0.2.47",
+  "version": "0.2.48",
   "type": "module",
   "exports": {
     ".": {
@@ -19,7 +19,7 @@
     "test:ci": "bun test --preload ../web/test/preload.ts --randomize --rerun-each 3"
   },
   "dependencies": {
-    "@gridland/utils": "workspace:*",
+    "@gridland/utils": "0.2.48",
     "events": "^3.3.0"
   },
   "devDependencies": {

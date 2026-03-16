@@ -1,8 +1,9 @@
 import type { RootRenderable } from "../../index"
 import React from "react"
+import { hostConfig } from "./host-config"
+
 import ReactReconciler from "react-reconciler"
 import { ConcurrentRoot } from "react-reconciler/constants"
-import { hostConfig } from "./host-config"
 
 export const reconciler = ReactReconciler(hostConfig)
 

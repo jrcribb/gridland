@@ -7,13 +7,19 @@
  * packages/core/ source. No engine code is externalized to @gridland/utils.
  * This prevents segfaults caused by bun:ffi pointers crossing npm package boundaries.
  *
+ * react-reconciler is kept EXTERNAL (not bundled) because:
+ * - Its production CJS build is missing getOwner() which React 19.2+ requires
+ * - Its development CJS build works but calls console.timeStamp which fails in
+ *   Bun's CJS context — fixed by the preload.js polyfill
+ *
  * Shared state (AppContext, engine) uses globalThis singletons so that hooks
  * imported from @gridland/utils reference the same instances as the bundled engine.
  */
 import * as esbuild from "esbuild"
 import path from "path"
-import { copyFileSync } from "fs"
+import { copyFileSync, readFileSync, writeFileSync } from "fs"
 import { fileURLToPath } from "url"
+import { createRequire } from "module"
 
 const pkgRoot = path.dirname(fileURLToPath(import.meta.url))
 const coreSrc = path.resolve(pkgRoot, "../core/src")
@@ -27,17 +33,40 @@ const requireShimBanner = [
   `  if (m) return m;`,
   `  throw new Error('Dynamic require of "' + id + '" is not supported');`,
   `});`,
-  // Force production mode for react-reconciler — the development build's user timing
-  // code writes errors to stderr that get captured by TerminalConsole.
-  `if (typeof process !== "undefined" && !process.env.NODE_ENV) process.env.NODE_ENV = "production";`,
 ].join(" ")
 
 function createPlugin() {
   const webShimsDir = path.resolve(pkgRoot, "../web/src/shims")
 
+  // Resolve react-reconciler's development CJS build and patch out console.timeStamp.
+  // The dev build is needed (production build is missing getOwner() for React 19.2+).
+  // But console.timeStamp is undefined in Bun's CJS context and crashes the reconciler.
+  const _require = createRequire(path.resolve(pkgRoot, "package.json"))
+  const reconcilerPkg = path.dirname(_require.resolve("react-reconciler/package.json"))
+  const reconcilerRequire = createRequire(path.join(reconcilerPkg, "index.js"))
+  const schedulerDir = path.dirname(reconcilerRequire.resolve("scheduler"))
+
   return {
     name: "bun-monolithic",
     setup(build) {
+      // Bundle react-reconciler dev build with console.timeStamp patched to no-op
+      build.onResolve({ filter: /^react-reconciler$/ }, () => ({
+        path: path.join(reconcilerPkg, "cjs/react-reconciler.development.js"),
+      }))
+      build.onResolve({ filter: /^react-reconciler\/constants$/ }, () => ({
+        path: path.join(reconcilerPkg, "cjs/react-reconciler-constants.development.js"),
+      }))
+      build.onLoad({ filter: /react-reconciler\.development\.js$/ }, (args) => {
+        let src = readFileSync(args.path, "utf8")
+        // Replace all console.timeStamp calls with no-ops
+        src = src.replace(/console\.timeStamp/g, "(function(){})")
+        return { contents: src, loader: "js" }
+      })
+      // Bundle scheduler's production build (no timeStamp issues there)
+      build.onResolve({ filter: /^scheduler$/ }, () => ({
+        path: path.join(schedulerDir, "cjs/scheduler.production.js"),
+      }))
+
       // Stub devtools (optional peer dep)
       build.onResolve({ filter: /devtools-polyfill/ }, () => ({
         path: path.resolve(webShimsDir, "devtools-polyfill-stub.ts"),
@@ -94,8 +123,8 @@ async function main() {
     external: [
       // React — peer dep, must be singleton
       "react", "react-dom",
-      // react-reconciler — CJS, resolved at runtime via Bun's require()
-      "react-reconciler", "react-reconciler/constants",
+      // scheduler — peer of react-reconciler, ships with react
+      "scheduler",
       // Bun native FFI — resolved at runtime
       "bun:ffi",
       // Node builtins
