@@ -27,7 +27,7 @@ jobs:
         run: bun run build
 
       - name: Run unit tests
-        run: bun run --cwd packages/web test && bun run --cwd packages/ui test && bun run --cwd packages/testing test && bun run --cwd packages/create-gridland test && bun run --cwd packages/create-gridland test:e2e && bun run --cwd packages/container test && bun run --cwd packages/demo test
+        run: bun run test
 
   e2e-tests:
     runs-on: ubuntu-latest
@@ -47,9 +47,6 @@ jobs:
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps chromium
-
-      - name: Build packages
-        run: bun run build
 
       - name: Run E2E tests
         run: bun run test:e2e
