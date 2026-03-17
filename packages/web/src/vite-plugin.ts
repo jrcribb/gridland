@@ -42,8 +42,8 @@ export function gridlandWebPlugin(): Plugin[] {
     }
     return path.resolve(pkgRoot, fallbackRelative)
   }
-  const coreRoot = resolvePackageRoot("@opentui/core", "../../core")
-  const reactRoot = resolvePackageRoot("@opentui/react", "../../core")
+  const coreRoot = resolvePackageRoot("@opentui/core", "../core")
+  const reactRoot = resolvePackageRoot("@opentui/react", "../core")
 
   // Detect whether opentui TypeScript source is available (monorepo)
   const hasSource = existsSync(path.resolve(coreRoot, "src/react/index.ts"))
@@ -157,15 +157,33 @@ export function gridlandWebPlugin(): Plugin[] {
     },
   }
 
+  const devtoolsStub = path.resolve(pkgRoot, "src/shims/devtools-polyfill-stub.ts")
+  const hastStub = path.resolve(pkgRoot, "src/shims/hast-stub.ts")
+
   const aliasPlugin: Plugin = {
     name: "gridland-web-aliases",
     config() {
       const aliases: Record<string, string> = {}
 
-      // FFI shims — still needed for lazy require("bun:ffi") in buffer.ts
+      // Node/Bun built-in shims for browser compatibility
       aliases["bun:ffi"] = path.resolve(pkgRoot, "src/shims/bun-ffi.ts")
       aliases["bun-ffi-structs"] = path.resolve(pkgRoot, "src/shims/bun-ffi-structs.ts")
       aliases["bun"] = path.resolve(pkgRoot, "src/shims/bun-ffi.ts")
+      aliases["node:buffer"] = path.resolve(pkgRoot, "src/shims/buffer-stub.ts")
+
+      // Devtools stubs — these are imported by devtools-polyfill.ts which
+      // is itself shimmed, but esbuild dep scanning follows imports before
+      // the shim plugin can intercept them.
+      aliases["react-devtools-core"] = devtoolsStub
+      aliases["ws"] = devtoolsStub
+
+      // Tree-sitter and related stubs — esbuild needs aliases, not just
+      // resolveId hooks, to avoid following these into missing packages.
+      if (hasSource) {
+        aliases["web-tree-sitter"] = treeStub
+        aliases["tree-sitter-styled-text"] = styledTextStub
+        aliases["hast-styled-text"] = hastStub
+      }
 
       // Resolve npm packages from @gridland/web's dependency tree
       for (const pkg of ["react-reconciler", "yoga-layout", "diff", "marked"]) {
@@ -186,13 +204,15 @@ export function gridlandWebPlugin(): Plugin[] {
           dedupe: ["react", "react-dom", "react-reconciler", "yoga-layout", "events"],
         },
         optimizeDeps: {
+          // yoga-layout uses WASM which esbuild can't handle; exclude from
+          // dep scanning and let the browser load it at runtime.
+          exclude: ["yoga-layout"],
           include: hasSource ? [
             "react",
             "react-dom",
             "react-reconciler",
             "react-reconciler/constants",
             "diff",
-            "yoga-layout",
             "marked",
           ] : [
             "react",
@@ -204,6 +224,7 @@ export function gridlandWebPlugin(): Plugin[] {
             strict: false,
           },
         },
+        assetsInclude: ["**/*.scm", "**/*.wasm"],
       }
     },
   }
