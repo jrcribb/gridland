@@ -1,6 +1,6 @@
 {
   "name": "@gridland/web",
-  "version": "0.2.49",
+  "version": "0.2.50",
   "type": "module",
   "exports": {
     ".": {
