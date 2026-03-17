@@ -93,11 +93,12 @@ export default function MessageDemo() {
 // ── Message + PromptInput demo (OpenRouter via Vercel) ───────────────
 
 import { useChat } from "@ai-sdk/react"
+import { chatTransport } from "@/lib/chat"
 import { renderContentParts } from "./render-message-parts-demo-utils"
 
 function MessageWithInputApp() {
   const { messages, status, sendMessage, stop } = useChat({
-    api: "/api/chat",
+    transport: chatTransport,
   })
 
   const chatStatus: ChatStatus =
