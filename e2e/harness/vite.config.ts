@@ -16,7 +16,7 @@ export default defineConfig({
     target: "esnext",
   },
   optimizeDeps: {
-    exclude: ["yoga-layout"],
+    exclude: ["yoga-layout", "react-devtools-core", "ws"],
     esbuildOptions: {
       target: "esnext",
     },
