@@ -84,11 +84,6 @@ export function gridlandWebPlugin(): Plugin[] {
         return path.resolve(pkgRoot, "src/shims/events-shim.ts")
       }
 
-      // ── Stub Node.js-only devtools deps ─────────────────────
-      if (source === "react-devtools-core" || source === "ws") {
-        return "\0opentui-devtools-stub"
-      }
-
       // ── Source mode only ──────────────────────────────────────
       if (!hasSource) return null
 
@@ -155,9 +150,6 @@ export function gridlandWebPlugin(): Plugin[] {
     load(id) {
       if (id === "\0opentui-asset-stub") {
         return "export default null;"
-      }
-      if (id === "\0opentui-devtools-stub") {
-        return "export default {}; export const connectToDevTools = () => {}; export const initialize = () => {};"
       }
       if (id === "\0opentui-core-native-stub") {
         return "export const CliRenderer = null; export const CliRenderEvents = null; export const createCliRenderer = null; export const NativeSpanFeed = null; export const setRenderLibPath = () => {};"
