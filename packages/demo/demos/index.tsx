@@ -24,6 +24,10 @@ import { TextStyleApp } from "./text-style"
 import { HeadlessApp } from "./headless"
 import { ThemingApp } from "./theming"
 import { LandingApp } from "../src/landing"
+import { RippleApp } from "./ripple"
+import { PuzzleApp } from "./puzzle"
+import { CanvasApp } from "./canvas"
+import { SnakeApp } from "./snake"
 
 export {
   GradientApp,
@@ -50,6 +54,10 @@ export {
   HeadlessApp,
   ThemingApp,
   LandingApp,
+  RippleApp,
+  PuzzleApp,
+  CanvasApp,
+  SnakeApp,
 }
 
 export interface Demo {
@@ -82,4 +90,8 @@ export const demos: Demo[] = [
   { name: "headless", app: () => <HeadlessApp /> },
   { name: "theming", app: () => <ThemingApp /> },
   { name: "landing", app: () => <LandingApp useKeyboard={useKeyboard} /> },
+  { name: "ripple", app: () => <RippleApp /> },
+  { name: "puzzle", app: () => <PuzzleApp /> },
+  { name: "canvas", app: () => <CanvasApp /> },
+  { name: "snake", app: () => <SnakeApp /> },
 ]
