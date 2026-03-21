@@ -18,6 +18,7 @@ export default defineConfig([
     target: "esnext",
     esbuildOptions(options) {
       options.alias = sharedAlias
+      options.jsx = "automatic"
     },
     async onSuccess() {
       const { readFileSync, writeFileSync } = await import("fs")
