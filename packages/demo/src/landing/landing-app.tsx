@@ -1,10 +1,11 @@
 // @ts-nocheck
 import { textStyle, useBreakpoints, useTheme } from '@gridland/ui'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { InstallBox } from './install-box'
 import { LinksBox } from './links-box'
 import { Logo } from './logo'
 import { MatrixBackground } from './matrix-background'
+import type { MatrixRipple } from './use-matrix'
 import { RippleApp } from '../../demos/ripple'
 import { PuzzleApp } from '../../demos/puzzle'
 import { CanvasApp } from '../../demos/canvas'
@@ -31,6 +32,8 @@ export function LandingApp({ useKeyboard }: LandingAppProps) {
   const theme = useTheme()
   const { width, height, isNarrow, isTiny, isMobile } = useBreakpoints()
   const [activeIndex, setActiveIndex] = useState(0)
+  const mousePosRef = useRef<{ x: number; y: number } | null>(null)
+  const matrixRipplesRef = useRef<MatrixRipple[]>([])
 
   useKeyboard((event: any) => {
     if (event.name === 'tab') {
@@ -118,8 +121,19 @@ export function LandingApp({ useKeyboard }: LandingAppProps) {
 
   return (
     <box width="100%" height="100%" position="relative">
-      <MatrixBackground width={width} height={height} clearRect={clearRect} clearRects={isBrowser ? undefined : [installLinksClearRect]} />
-      <box position="absolute" top={0} left={0} width={width} height={height} zIndex={1} flexDirection="column" shouldFill={false}>
+      <MatrixBackground width={width} height={height} clearRect={clearRect} clearRects={isBrowser ? undefined : [installLinksClearRect]} mousePosRef={mousePosRef} ripplesRef={matrixRipplesRef} />
+      <box
+        position="absolute" top={0} left={0} width={width} height={height} zIndex={1} flexDirection="column" shouldFill={false}
+        onMouseMove={(e: any) => {
+          mousePosRef.current = { x: e.x, y: e.y }
+        }}
+        onMouseDown={(e: any) => {
+          matrixRipplesRef.current = [
+            ...matrixRipplesRef.current,
+            { x: e.x, y: e.y, createdAt: Date.now() },
+          ]
+        }}
+      >
         <box flexGrow={1} flexDirection="column" paddingTop={isMobile ? 1 : 3} paddingLeft={1} paddingRight={1} paddingBottom={1} gap={isMobile ? 0 : 1} shouldFill={false}>
           <box flexShrink={0} shouldFill={false}>
             <Logo compact={isTiny} narrow={isNarrow} mobile={isMobile} />
