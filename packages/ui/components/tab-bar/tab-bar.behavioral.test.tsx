@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach } from "bun:test"
 import { useState } from "react"
 import { renderTui, cleanup } from "../../../testing/src/index"
 import { useKeyboard } from "@gridland/utils"
-import { GridlandProvider } from "../provider/provider"
+import { GridlandProvider } from "@/registry/gridland/ui/provider/provider"
 import { TabBar, Tabs, TabsList, TabsTrigger, TabsContent } from "./tab-bar"
 
 afterEach(() => cleanup())
@@ -13,7 +13,7 @@ function flushN(flush: () => void) {
 
 async function settle(flush: () => void) {
   flushN(flush)
-  await new Promise(resolve => setTimeout(resolve, 20))
+  await new Promise(resolve => setTimeout(resolve, 50))
   flushN(flush)
 }
 
