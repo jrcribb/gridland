@@ -1,6 +1,6 @@
 {
   "name": "@gridland/web",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "exports": {
     ".": {
@@ -26,7 +26,8 @@
     },
     "./jsx": {
       "types": "./src/gridland-jsx.d.ts"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

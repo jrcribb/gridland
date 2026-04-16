@@ -1,34 +1,17 @@
 ---
-title: Focus & Navigation
-description: Focus management, keyboard routing, selection, and pointer events
+title: Focus
+description: Focus management, keyboard routing, and selection
 ---
 
 import { DemoWindow } from '@/components/ui/demo-window'
 import { FocusApp } from '@demos/focus'
-import { PointerApp } from '@demos/pointer'
-import { CursorHighlightApp } from '@demos/cursor-highlight'
 import FocusGridDemo from '@/components/demos/focus-grid-demo'
-import FocusAIChatDemo from '@/components/demos/focus-ai-chat-demo'
 
 Gridland provides a unified focus and input system that works identically in both terminal and web runtimes.
 
-## Focus
+## Examples
 
-### Examples
-
-#### AI Chat with Focus & Navigation
-
-<div className="my-8">
-  <FocusAIChatDemo />
-</div>
-
-#### Spatial Navigation
-
-<div className="my-8">
-  <FocusGridDemo />
-</div>
-
-#### Focus with Multi-Select
+### Focus with Multi-Select
 
 <div className="my-8">
   <DemoWindow title="Focus & Navigation" tuiStyle={{ width: "100%", height: 340 }} autoFocus>
@@ -36,7 +19,13 @@ Gridland provides a unified focus and input system that works identically in bot
   </DemoWindow>
 </div>
 
-### Usage
+### Spatial Navigation
+
+<div className="my-8">
+  <FocusGridDemo />
+</div>
+
+## Usage
 
 The primary API is `useInteractive` — one hook that composes focus registration,
 selection-scoped keyboard routing, and shortcut hints. It lives in `@gridland/utils`
@@ -108,7 +97,7 @@ function AppStatusBar() {
 }
 ```
 
-### useInteractive reference
+## useInteractive reference
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
@@ -122,7 +111,7 @@ function AppStatusBar() {
 Returns: `focusRef`, `focusId`, `isFocused`, `isSelected`, `isAnySelected`,
 `onKey(handler)`, `focus()`, `blur()`, `select()`, `deselect()`.
 
-### Styled variant
+## Styled variant
 
 If your component renders a focus-responsive border, `useInteractiveStyled` from
 `@gridland/ui` bundles the border styling back in for a single-call ergonomic:
@@ -156,38 +145,33 @@ underlying listener is registered once per mount and replaces the stored
 handler on each call. The handler fires **only while this component is
 selected** (focused + Enter pressed).
 
-### Low-level APIs
-
-The raw primitives remain for edge cases:
+## Structural context
 
 - **`FocusProvider`** — the root wrapper (mounted implicitly by `GridlandProvider`). Pass `disableFocusProvider` to `GridlandProvider` to opt out of the implicit wrap.
-- **`useFocus`** — registers a focusable element without the keyboard / shortcuts / styling pieces. Used by components that are focused-is-interactive (like `TabsList` and `PromptInput`), which don't fit the focused→selected lifecycle.
-- **`useKeyboard`** — raw keyboard subscription. Pair with `{ focusId }` for focused-only routing or `{ global: true }` to always listen.
-- **`useShortcuts`** / **`useFocusedShortcuts`** — register and read shortcut hints.
 - **`FocusScope`** — constrain navigation to a subtree (useful for modals and menus).
 
-### How it works
+## How it works
 
 **`FocusProvider`** enables the focus system. Pass `selectable` to enable two-layer focus: components are first **focused** (highlighted), then **selected** (entered for interaction) with Enter. Escape deselects.
 
-**`useFocus`** makes a component focusable. It returns:
+`useInteractive` registers a focusable element with the system. It returns:
 
 - `isFocused` / `isSelected` / `isAnySelected` for styling based on focus state. `isAnySelected` is scope-aware: it stays true for global-scope components even when the selection is saved behind a `FocusScope`
-- `focusId` to pass to other hooks like `useKeyboard` and `useShortcuts`
+- `focusId` to pass to other hooks like `useKeyboard` and `useShortcuts` when you need them directly
 - `focusRef` to attach to the root element so arrow-key navigation can measure positions
 - `focus()` / `blur()` to imperatively move focus
 - `select()` / `deselect()` to imperatively enter or exit selection
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `id` | `string` | auto-generated | Unique identifier for this focusable |
-| `tabIndex` | `number` | `0` | Tab order. `-1` to skip tab navigation |
-| `autoFocus` | `boolean` | `false` | Focus immediately on mount |
-| `disabled` | `boolean` | `false` | Skip in tab order when true |
-| `scopeId` | `string \| null` | context scope | Override which FocusScope this element belongs to |
-| `selectable` | `boolean` | `true` | Whether this component supports selection (Enter to interact) |
+- `onKey(handler)` to register a keyboard handler that fires only while this component is selected
 
 **Navigation** works two ways: **Tab/Shift+Tab** cycles in linear order, **arrow keys** navigate spatially to the nearest neighbor. If a component handles arrows internally (e.g., a SelectInput), call `event.preventDefault()` to prevent the FocusProvider from also navigating.
+
+### Display wrappers share a focusId
+
+A component that only needs to observe focus state (e.g. a bordered wrapper around an already-interactive child) should call `useInteractive({ id })` with **no** `shortcuts` option and **without** calling `onKey`. Share the same `id` with the inner interactive component. The outer call registers for state observation; the shortcut dispatch is a no-op on an empty array, so the wrapper does not stomp the inner component's shortcut registration.
+
+## Advanced: raw primitives
+
+These remain exported from `@gridland/utils` as escape hatches for advanced cases (global keyboard listeners, custom shortcut reducers, status bar integration). Reach for `useInteractive` first — the primitives below exist for cases it cannot express.
 
 **`useKeyboard`** handles keyboard input. Pass `focusId` to scope it to the focused component, or `global: true` to always listen.
 
@@ -200,7 +184,7 @@ The raw primitives remain for edge cases:
 
 **`useShortcuts`** registers keyboard hints tied to a `focusId`. They update automatically as the user navigates. **`useFocusedShortcuts`** reads the active shortcuts for display in a StatusBar.
 
-### FocusScope
+## FocusScope
 
 Constrain navigation to a group of components. When `trap` is enabled, Tab wraps around instead of leaving the scope. Useful for modals and menus.
 
@@ -220,112 +204,7 @@ Constrain navigation to a group of components. When `trap` is enabled, Tab wraps
 | `autoSelect` | `boolean` | `false` | Auto-select if only one focusable element exists on mount |
 | `restoreOnUnmount` | `boolean` | `true` | Restore previous focus on unmount |
 
-## Pointer Events
+## Related
 
-<div className="my-8">
-  <DemoWindow title="Pointer Events" tuiStyle={{ width: "100%", height: 280 }}>
-    <PointerApp />
-  </DemoWindow>
-</div>
-
-### Usage
-
-```tsx title="app.tsx"
-import { useState } from "react"
-
-const colors = ["#ef4444", "#3b82f6", "#22c55e", "#8b5cf6"]
-const names = ["Red", "Blue", "Green", "Purple"]
-
-function PointerDemo() {
-  const [selected, setSelected] = useState<number | null>(null)
-  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null)
-
-  return (
-    <box flexDirection="column" padding={1}>
-      {/* Click to select a color */}
-      <box flexDirection="row" gap={1}>
-        {colors.map((color, i) => (
-          <box
-            key={color}
-            flexGrow={1}
-            height={3}
-            border
-            borderColor={i === selected ? color : "#555"}
-            onMouseDown={(e) => {
-              setSelected(i)
-              setMousePos({ x: e.x, y: e.y })
-            }}
-          >
-            <text style={{ fg: color, bold: i === selected }}>{names[i]}</text>
-          </box>
-        ))}
-      </box>
-
-      {/* Hover detection */}
-      <HoverBox />
-
-      {/* Display click result */}
-      <text>{selected !== null ? `Clicked ${names[selected]}` : "Click a color"}</text>
-      <text style={{ dim: true }}>{mousePos ? `mouse: ${mousePos.x}, ${mousePos.y}` : ""}</text>
-    </box>
-  )
-}
-
-function HoverBox() {
-  const [hovering, setHovering] = useState(false)
-
-  return (
-    <box
-      border
-      borderColor={hovering ? "#22c55e" : "#555"}
-      onMouseOver={() => setHovering(true)}
-      onMouseOut={() => setHovering(false)}
-    >
-      <text>{hovering ? "Mouse inside!" : "Hover me"}</text>
-    </box>
-  )
-}
-```
-
-### How it works
-
-All intrinsic elements (`<box>`, `<text>`, etc.) support mouse event props. Each event receives an object with `x`, `y` coordinates relative to the element.
-
-`onClick` is a synthetic event that fires when mouseDown and mouseUp occur on the same element.
-
-| Event | Description |
-|-------|-------------|
-| `onMouseDown` | Mouse button pressed |
-| `onMouseUp` | Mouse button released |
-| `onClick` | Press and release on the same element |
-| `onMouseOver` | Cursor enters the element |
-| `onMouseOut` | Cursor leaves the element |
-| `onMouseScroll` | Scroll wheel over the element |
-
-## Cursor Highlight
-
-<div className="my-8">
-  <DemoWindow title="Cursor Highlight" tuiStyle={{ width: "100%", height: 260 }} cursorHighlight>
-    <CursorHighlightApp />
-  </DemoWindow>
-</div>
-
-### Usage
-
-```tsx title="app.tsx"
-<TUI cursorHighlight cursorHighlightColor="#8888ff" cursorHighlightOpacity={0.2}>
-  <box border>
-    <text>Move the mouse over cells to see the highlight</text>
-  </box>
-</TUI>
-```
-
-### How it works
-
-Cursor highlight adds a visual overlay on the cell under the mouse cursor. Enable it on the root `TUI` component.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `cursorHighlight` | `boolean` | `false` | Enable cell highlighting |
-| `cursorHighlightColor` | `string` | gray | CSS color for highlight |
-| `cursorHighlightOpacity` | `number` | `0.15` | Opacity of highlight |
+- [Pointer Events](/docs/interaction/pointer-events) mouse handlers, event shape, hit testing, and propagation.
+- [Cursor Highlight](/docs/interaction/cursor-highlight) highlight the terminal cell under the mouse cursor.
