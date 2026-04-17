@@ -1,6 +1,7 @@
 {
   "name": "gridland-docs",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "fumadocs-mdx && next build && bun run scripts/extract-tui-txt.ts",

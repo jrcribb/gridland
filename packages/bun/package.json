@@ -1,6 +1,7 @@
 {
   "name": "@gridland/bun",
   "version": "0.4.2",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": {

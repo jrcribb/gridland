@@ -2,6 +2,7 @@
   "name": "create-gridland",
   "version": "0.4.2",
   "description": "Create a new Gridland project",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "create-gridland": "./dist/index.js"
